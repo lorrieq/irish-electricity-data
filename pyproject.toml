@@ -1,0 +1,24 @@
+[project]
+name = "irish-electricity-data"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Laurence Quinn", email = "lorrieq@hotmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+irish-electricity-data = "irish_electricity_data:main"
+
+[build-system]
+requires = ["uv_build>=0.11.3,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.9",
+]
