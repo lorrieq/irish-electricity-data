@@ -7,7 +7,9 @@ authors = [
     { name = "Laurence Quinn", email = "lorrieq@hotmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "requests>=2.33.1",
+]
 
 [project.scripts]
 irish-electricity-data = "irish_electricity_data:main"
