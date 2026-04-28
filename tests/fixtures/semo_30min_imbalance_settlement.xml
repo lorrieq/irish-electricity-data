@@ -1,0 +1,4 @@
+<?xml version = '1.0'?>
+<OutboundData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="mi-outbound-reports-isem.xsd" DatasetName="PUB_30MinAvgImbalPrc" DatasetType="HALF_HOURLY" Date="2026-04-23" DateType="TRADE" PublishTime="2026-04-23T16:00:03">
+  <PUB_30MinAvgImbalPrc ROW="1" TradeDate="2026-04-23" StartTime="2026-04-23T15:00:00" EndTime="2026-04-23T15:30:00" NetImbalanceVolume="-50.273" ImbalanceSettlementPrice="-22.6"/>
+</OutboundData>

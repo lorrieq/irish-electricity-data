@@ -1,0 +1,28 @@
+{
+    "Rows": [
+        {
+            "EffectiveTime": "25-Apr-2026 00:00:00",
+            "FieldName": "INTER_EWIC",
+            "Region": "ROI",
+            "Value": 3
+        },
+        {
+            "EffectiveTime": "25-Apr-2026 00:00:00",
+            "FieldName": "INTER_GRNLK",
+            "Region": "ROI",
+            "Value": 520
+        },
+        {
+            "EffectiveTime": "25-Apr-2026 00:00:00",
+            "FieldName": "INTER_MOYLE",
+            "Region": "NI",
+            "Value": 363
+        },
+        {
+            "EffectiveTime": "25-Apr-2026 00:00:00",
+            "FieldName": "INTER_NET",
+            "Region": "ALL",
+            "Value": 886
+        }
+    ]
+}

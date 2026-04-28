@@ -1,2 +1,67 @@
-def main() -> None:
-    print("Hello from irish-electricity-data!")
+from .client import MarketClient
+from .core.exceptions import (
+    IrishElectricityDataError,
+    ParseError,
+    ProviderError,
+    ProviderRateLimited,
+    ProviderTimeout,
+    ReportNotFoundError,
+    TimezoneAmbiguityError,
+)
+from .core.orchestrator import RetryPolicy
+from .providers import (
+    BaseProvider,
+    EirGridProvider,
+    Interconnector,
+    ProviderCapability,
+    Region,
+    SemoProvider,
+    SemopxProvider,
+    Variable,
+)
+from .schema import (
+    Auction,
+    AuctionResult,
+    DataPoint,
+    DataStatus,
+    ImbalancePriceReport,
+    ImbalancePriceSuppInfo,
+    ImbalanceSettlementReport,
+    MarketResult,
+    PhysicalNotification,
+    PortfolioPosition,
+    ReportReference,
+    Series,
+)
+
+__all__ = [
+    "Auction",
+    "AuctionResult",
+    "BaseProvider",
+    "DataPoint",
+    "DataStatus",
+    "EirGridProvider",
+    "ImbalancePriceReport",
+    "ImbalancePriceSuppInfo",
+    "ImbalanceSettlementReport",
+    "Interconnector",
+    "IrishElectricityDataError",
+    "MarketClient",
+    "MarketResult",
+    "ParseError",
+    "PhysicalNotification",
+    "PortfolioPosition",
+    "ProviderCapability",
+    "ProviderError",
+    "ProviderRateLimited",
+    "ProviderTimeout",
+    "Region",
+    "ReportNotFoundError",
+    "ReportReference",
+    "RetryPolicy",
+    "SemoProvider",
+    "SemopxProvider",
+    "Series",
+    "TimezoneAmbiguityError",
+    "Variable",
+]

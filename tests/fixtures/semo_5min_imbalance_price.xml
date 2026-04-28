@@ -1,0 +1,4 @@
+<?xml version = '1.0'?>
+<OutboundData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="mi-outbound-reports-isem.xsd" DatasetName="PUB_5MinImbalPrc" DatasetType="SUB_HOURLY" Date="2026-04-23" DateType="TRADE" PublishTime="2026-04-23T11:37:40">
+  <PUB_5MinImbalPrc ROW="1" TradeDate="2026-04-23" StartTime="2026-04-23T11:15:00" EndTime="2026-04-23T11:20:00" NetImbalanceVolume="-9.073" ImbalancePrice="6.24" DefaultPriceUsage="N" ASPPriceUsage="N" TotalUnitAvailability="11228.58" DemandControlVolume="0" PMEA="-317.87" QPAR="10" AdministeredScarcityPrice="-1000" MarketBackupPrice="83.77" ShortTermReserveQuantity="5341.616" OperatingReserveRequirement="475.62"/>
+</OutboundData>
