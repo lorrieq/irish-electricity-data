@@ -1,0 +1,1506 @@
+<InterconnectorFlowCapacityDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://amp.unicorn.eu/xsd/InterconnectorFlowCapacityDocument.xsd">
+  <DocumentIdentification v="IDA1_InterconnectorFlows_20260501" />
+  <DocumentVersion v="1" />
+  <CreationDateTime v="2026-04-30T17:01:49Z" />
+  <CapacityTimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+  <CapacityTimeSeries>
+    <TimeSeriesIdentification v="1" />
+    <AuctionIdentification v="IDA1-20260501" />
+    <Interconnector v="GREENLINK" />
+    <InterconnectorDirection v="GB2-IE2" />
+    <Period>
+      <TimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+      <Resolution v="PT30M" />
+      <Interval>
+        <StartTime v="22:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="22:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:00" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:30" />
+        <Scheduled v="513" />
+        <TotalScheduled v="513" />
+      </Interval>
+    </Period>
+  </CapacityTimeSeries>
+  <CapacityTimeSeries>
+    <TimeSeriesIdentification v="2" />
+    <AuctionIdentification v="IDA1-20260501" />
+    <Interconnector v="GREENLINK" />
+    <InterconnectorDirection v="IE2-GB2" />
+    <Period>
+      <TimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+      <Resolution v="PT30M" />
+      <Interval>
+        <StartTime v="22:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="22:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+    </Period>
+  </CapacityTimeSeries>
+  <CapacityTimeSeries>
+    <TimeSeriesIdentification v="3" />
+    <AuctionIdentification v="IDA1-20260501" />
+    <Interconnector v="MOYLE" />
+    <InterconnectorDirection v="GB-NI" />
+    <Period>
+      <TimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+      <Resolution v="PT30M" />
+      <Interval>
+        <StartTime v="22:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="22:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:00" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:30" />
+        <Scheduled v="450" />
+        <TotalScheduled v="450" />
+      </Interval>
+    </Period>
+  </CapacityTimeSeries>
+  <CapacityTimeSeries>
+    <TimeSeriesIdentification v="4" />
+    <AuctionIdentification v="IDA1-20260501" />
+    <Interconnector v="MOYLE" />
+    <InterconnectorDirection v="NI-GB" />
+    <Period>
+      <TimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+      <Resolution v="PT30M" />
+      <Interval>
+        <StartTime v="22:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="22:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+    </Period>
+  </CapacityTimeSeries>
+  <CapacityTimeSeries>
+    <TimeSeriesIdentification v="5" />
+    <AuctionIdentification v="IDA1-20260501" />
+    <Interconnector v="EWIC" />
+    <InterconnectorDirection v="GB-IE" />
+    <Period>
+      <TimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+      <Resolution v="PT30M" />
+      <Interval>
+        <StartTime v="22:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="22:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+    </Period>
+  </CapacityTimeSeries>
+  <CapacityTimeSeries>
+    <TimeSeriesIdentification v="6" />
+    <AuctionIdentification v="IDA1-20260501" />
+    <Interconnector v="EWIC" />
+    <InterconnectorDirection v="IE-GB" />
+    <Period>
+      <TimeInterval v="2026-04-30T22:00Z/2026-05-01T22:00Z" />
+      <Resolution v="PT30M" />
+      <Interval>
+        <StartTime v="22:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="22:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="23:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="00:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="01:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="02:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="03:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="04:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="05:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="06:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="07:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="08:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="09:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="10:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="11:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="12:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="13:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="14:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="15:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="16:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="17:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="18:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="19:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="20:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:00" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+      <Interval>
+        <StartTime v="21:30" />
+        <Scheduled v="0" />
+        <TotalScheduled v="0" />
+      </Interval>
+    </Period>
+  </CapacityTimeSeries>
+</InterconnectorFlowCapacityDocument>

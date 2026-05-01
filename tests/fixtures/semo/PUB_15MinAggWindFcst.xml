@@ -1,0 +1,8 @@
+<?xml version = '1.0'?>
+<OutboundData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="mi-outbound-reports-isem.xsd" DatasetName="PUB_15MinAggWindFcst" DatasetType="ON_DEMAND" Date="2025-05-25" DateType="TRADE" PublishTime="2025-05-25T06:14:02">
+  <PUB_15MinAggWindFcst ROW="1" TradeDate="2025-05-25" DeliveryDate="2025-05-24" StartTime="2025-05-24T22:00:00" EndTime="2025-05-24T22:15:00" Forecast="3617.03"/>
+  <PUB_15MinAggWindFcst ROW="2" TradeDate="2025-05-25" DeliveryDate="2025-05-24" StartTime="2025-05-24T22:15:00" EndTime="2025-05-24T22:30:00" Forecast="3647.167"/>
+  <PUB_15MinAggWindFcst ROW="3" TradeDate="2025-05-25" DeliveryDate="2025-05-24" StartTime="2025-05-24T22:30:00" EndTime="2025-05-24T22:45:00" Forecast="3677.293"/>
+  <PUB_15MinAggWindFcst ROW="4" TradeDate="2025-05-25" DeliveryDate="2025-05-24" StartTime="2025-05-24T22:45:00" EndTime="2025-05-24T23:00:00" Forecast="3707.437"/>
+  <PUB_15MinAggWindFcst ROW="5" TradeDate="2025-05-25" DeliveryDate="2025-05-24" StartTime="2025-05-24T23:00:00" EndTime="2025-05-24T23:15:00" Forecast="3737.561"/>
+</OutboundData>

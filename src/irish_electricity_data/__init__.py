@@ -13,23 +13,23 @@ from .providers import (
     BaseProvider,
     EirGridProvider,
     Interconnector,
-    ProviderCapability,
     Region,
     SemoProvider,
     SemopxProvider,
     Variable,
 )
-from .schema import (
-    Auction,
+from .providers.semo import (
     AuctionResult,
-    DataPoint,
-    DataStatus,
     ImbalancePriceReport,
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
-    MarketResult,
     PhysicalNotification,
-    PortfolioPosition,
+)
+from .providers.semopx import MarketResult, PortfolioPosition
+from .schema import (
+    Auction,
+    DataPoint,
+    DataStatus,
     ReportReference,
     Series,
 )
@@ -51,7 +51,6 @@ __all__ = [
     "ParseError",
     "PhysicalNotification",
     "PortfolioPosition",
-    "ProviderCapability",
     "ProviderError",
     "ProviderRateLimited",
     "ProviderTimeout",

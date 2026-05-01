@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from enum import StrEnum
 from typing import Any, ClassVar
 
 import httpx
@@ -9,25 +8,14 @@ from ..core.orchestrator import RetryPolicy, with_retries
 from ..core.transport import build_client
 
 
-class ProviderCapability(StrEnum):
-    AUCTION_RESULTS = "AUCTION_RESULTS"
-    MARKET_RESULTS = "MARKET_RESULTS"
-    GENERATION = "GENERATION"
-    DEMAND = "DEMAND"
-    WIND = "WIND"
-    SOLAR = "SOLAR"
-    INTERCONNECTOR = "INTERCONNECTOR"
-
-
 class BaseProvider:
-    """Abstract provider. Subclasses declare `name`, `base_url`, and `capabilities`.
+    """Abstract provider. Subclasses declare `name` and `base_url`.
 
     Provides retry-wrapped primitives for GETting JSON or raw bytes.
     """
 
     name: ClassVar[str] = ""
     base_url: ClassVar[str] = ""
-    capabilities: ClassVar[frozenset[ProviderCapability]] = frozenset()
 
     def __init__(
         self,
@@ -50,9 +38,6 @@ class BaseProvider:
 
     def __exit__(self, *exc_info: object) -> None:
         self.close()
-
-    def supports(self, capability: ProviderCapability) -> bool:
-        return capability in self.capabilities
 
     def _get_bytes(self, path: str, *, params: Any | None = None) -> bytes:
         def call() -> bytes:

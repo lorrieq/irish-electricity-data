@@ -1,0 +1,5 @@
+<?xml version = '1.0'?>
+<OutboundData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="mi-outbound-reports-isem.xsd" DatasetName="PUB_LTSDOperationalSchedule" DatasetType="HOURLY" Date="2025-05-26" DateType="TRADE" PublishTime="2025-05-26T01:00:56">
+<PUB_LTSDOperationalSchedule ROW="1" PublishTime="2025-05-26T01:00:00" ParticipantName="IO_EIDAC" ResourceName="I_ROIEWIC" ResourceType="IU" DeliveryDate="2025-05-26" TradeDate="2025-05-26" StartTime="2025-05-26T02:00:00" EndTime="2025-05-26T02:30:00" ScheduledQuantity="3.053" RunType="LTSD"/>
+<PUB_LTSDOperationalSchedule ROW="210" PublishTime="2025-05-26T01:00:00" ParticipantName="PT_400021" ResourceName="GU_400030" ResourceType="GEN" DeliveryDate="2025-05-26" TradeDate="2025-05-26" StartTime="2025-05-26T06:30:00" EndTime="2025-05-26T07:00:00" ScheduledQuantity="0" RunType="LTSD"/>
+</OutboundData>

@@ -104,4 +104,4 @@ Add the parser to `providers/*/\_\_init\_\_.py` and the model to the top-level
 - Keep the scope small — one report type, one bug fix, or one focused refactor per PR.
 - Include the new or updated fixture file in the same commit as the parser and test.
 - If you are unsure about the shape of a model or the right place to put something, open an issue first.
-- Use of LLMs/AI to assist with development is permitted but the resulting code must follow conventions and code style.
+- Use of LLMs/AI to assist with development is permitted but the resulting code must follow existing conventions and code style.

@@ -1,0 +1,5 @@
+<?xml version = '1.0'?>
+<OutboundData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="mi-outbound-reports-isem.xsd" DatasetName="PUB_HrlyForecastImbalance" DatasetType="HOURLY" Date="2025-05-26" DateType="TRADE" PublishTime="2025-05-26T08:00:31">
+<PUB_HrlyForecastImbalance ROW="1" TradeDate="2025-05-26" StartTime="2025-05-26T09:00:00" EndTime="2025-05-26T09:30:00" TotalPN="334.9" NetInterconnectorSchedule="1493" TSODemandForecast="4990" TSORenewableForecast="2630.566" CalculatedImbalance="531.534"/>
+<PUB_HrlyForecastImbalance ROW="2" TradeDate="2025-05-26" StartTime="2025-05-26T09:30:00" EndTime="2025-05-26T10:00:00" TotalPN="338.1" NetInterconnectorSchedule="1493" TSODemandForecast="4968" TSORenewableForecast="2868.1" CalculatedImbalance="268.8"/>
+</OutboundData>

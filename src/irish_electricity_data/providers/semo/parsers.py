@@ -6,16 +6,127 @@ from xml.etree import ElementTree as ET
 
 from ...core.constants import TZ_UTC
 from ...core.exceptions import ParseError
-from ...schema.models import (
-    AuctionResult,
-    DataPoint,
-    ImbalancePriceReport,
-    ImbalancePriceSuppInfo,
-    ImbalanceSettlementReport,
-    PhysicalNotification,
-    ReportReference,
-    Series,
-)
+from ...schema.models import DataPoint, ReportReference, Series, _FrozenModel
+
+
+class AuctionResult(_FrozenModel):
+    """Parsed SEMO auction report: prices, volumes, net positions across NI/ROI."""
+
+    auction_date: dt.datetime | None = None
+    delivery_date: dt.date | None = None
+    publish_time: dt.datetime | None = None
+    series: list[Series]
+
+
+class ImbalancePriceReport(_FrozenModel):
+    """A single 5-minute imbalance-pricing period from SEMO (DPuG BM-025)."""
+
+    trade_date: dt.date
+    start_time: dt.datetime
+    end_time: dt.datetime
+    publish_time: dt.datetime
+    net_imbalance_volume: float
+    imbalance_price: float
+    default_price_usage: bool
+    asp_price_usage: bool
+    total_unit_availability: float
+    demand_control_volume: float
+    pmea: float
+    qpar: float
+    administered_scarcity_price: float
+    market_backup_price: float
+    short_term_reserve_quantity: float
+    operating_reserve_requirement: float
+
+
+class ImbalanceSettlementReport(_FrozenModel):
+    """A 30-minute imbalance settlement period from SEMO (DPuG BM-026).
+
+    This is the settlement price — the volume-weighted average of the six 5-minute
+    imbalance pricing periods in the half hour.
+    """
+
+    trade_date: dt.date
+    start_time: dt.datetime
+    end_time: dt.datetime
+    publish_time: dt.datetime
+    net_imbalance_volume: float
+    imbalance_settlement_price: float
+
+
+class ImbalancePriceSuppInfo(_FrozenModel):
+    """A single BOA row from a 5-minute imbalance price supplementary info report.
+
+    Each file covers one 5-minute period and contains one row per bid/offer acceptance
+    that contributed to the imbalance price calculation.
+    """
+
+    trade_date: dt.date
+    start_time: dt.datetime
+    end_time: dt.datetime
+    publish_time: dt.datetime
+    participant_name: str
+    resource_name: str
+    pboa: float
+    qboa: float
+    rank: int
+    so_flag: bool
+    emergency_flag: bool
+    non_marginal_flag: bool
+    imbalance_price_flag: bool
+    net_imbalance_volume_tag: float
+    imbalance_price_tag: float
+    price_average_reference_tag: float
+    net_imbalance_volume: float
+    non_energy_flags: int | None = None
+    constraint_id: str | None = None
+
+
+class HrlyForecastImbalance(_FrozenModel):
+    """A single row from a hourly forecast imbalance report (PUB_HrlyForecastImbalance)."""
+
+    publish_time: dt.datetime
+    start_time: dt.datetime
+    total_pn: float
+    net_interconnector_schedule: float
+    tso_demand_forecast: float
+    tso_renewable_forecast: float
+    calculated_imbalance: float
+
+
+class DailyMeterData(_FrozenModel):
+    """A single 30-minute metering interval from a D1 daily meter data report."""
+
+    resource_name: str
+    start_time: dt.datetime
+    end_time: dt.datetime
+    metered_mw: float
+
+
+class PhysicalNotification(_FrozenModel):
+    """A single row from a daily final physical notifications report (DPuG BM-023)."""
+
+    resource_name: str
+    start_time: dt.datetime
+    start_mw: float
+    end_time: dt.datetime
+    end_mw: float
+    under_test: bool
+    publish_time: dt.datetime
+
+
+class Forecast(_FrozenModel):
+    name: str
+    source: str
+    publish_time: dt.datetime
+    data: list[DataPoint]
+
+
+class LTSReport(_FrozenModel):
+    publish_time: dt.datetime
+    resource_name: str
+    start_time: dt.datetime
+    scheduled_quantity: float
 
 
 def parse_report_list(items: list[dict[str, Any]]) -> list[ReportReference]:
@@ -235,6 +346,31 @@ def parse_physical_notifications_report(xml: str) -> list[PhysicalNotification]:
     ]
 
 
+def parse_daily_meter_data_report(xml: str) -> list[DailyMeterData]:
+    """Parse a `PUB_DailyMeterDataD1_*.xml` payload into a list of `DailyMeterData` rows.
+
+    Each file covers one trade day; rows represent 30-minute metering intervals per resource.
+    """
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"invalid XML: {exc}") from exc
+
+    rows = root.findall("PUB_DailyMeterDataD1")
+    if not rows:
+        raise ParseError("meter data report missing <PUB_DailyMeterDataD1> elements")
+
+    return [
+        DailyMeterData(
+            resource_name=row.attrib["ResourceName"],
+            start_time=_parse_aware_utc(row.attrib["StartTime"]),
+            end_time=_parse_aware_utc(row.attrib["EndTime"]),
+            metered_mw=float(row.attrib["MeteredMW"]),
+        )
+        for row in rows
+    ]
+
+
 def parse_imbalance_price_supp_info_report(xml: str) -> list[ImbalancePriceSuppInfo]:
     """Parse a `PUB_5MinImbalPrcSuppInfo_*.xml` payload into a list of BOA rows.
 
@@ -279,3 +415,77 @@ def parse_imbalance_price_supp_info_report(xml: str) -> list[ImbalancePriceSuppI
             )
         )
     return result
+
+
+def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance]:
+    """Parse a `PUB_HrlyForecastImbalance_*.xml` payload into a list of rows.
+
+    Each file covers one trade day; rows represent individual half-hour forecast
+    imbalance periods.
+    """
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"invalid XML: {exc}") from exc
+
+    publish_time = _parse_aware_utc(root.attrib["PublishTime"])
+
+    rows = root.findall("PUB_HrlyForecastImbalance")
+    if not rows:
+        raise ParseError("forecast imbalance report missing <PUB_HrlyForecastImbalance> elements")
+
+    return [
+        HrlyForecastImbalance(
+            publish_time=publish_time,
+            start_time=_parse_aware_utc(a["StartTime"]),
+            total_pn=float(a["TotalPN"]),
+            net_interconnector_schedule=float(a["NetInterconnectorSchedule"]),
+            tso_demand_forecast=float(a["TSODemandForecast"]),
+            tso_renewable_forecast=float(a["TSORenewableForecast"]),
+            calculated_imbalance=float(a["CalculatedImbalance"]),
+        )
+        for row in rows
+        for a in (row.attrib,)
+    ]
+
+
+def parse_wind_forecast_report(xml: str):
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"Invalid XML: {exc}") from exc
+
+    publish_time = _parse_aware_utc(root.attrib["PublishTime"])
+    rows = root.findall("PUB_15MinAggWindFcst")
+    if not rows:
+        raise ParseError("Wind forecast report has no <PUB_15MinAggWindFcst> elements")
+
+    points = [
+        DataPoint(timestamp=_parse_aware_utc(a["StartTime"]), value=a["Forecast"])
+        for row in rows
+        for a in (row.attrib,)
+    ]
+
+    return Forecast(name="wind_forecast", source="semo", publish_time=publish_time, data=points)
+
+
+def parse_lts_report(xml: str):
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"Invalid XML: {exc}") from exc
+
+    rows = root.findall("PUB_LTSDOperationalSchedule")
+    if not rows:
+        raise ParseError("LTS report has no <PUB_LTSDOperationalSchedule> elements")
+
+    return [
+        LTSReport(
+            publish_time=a["PublishTime"],
+            resource_name=a["ResourceName"],
+            start_time=a["StartTime"],
+            scheduled_quantity=a["ScheduledQuantity"],
+        )
+        for row in rows
+        for a in (row.attrib,)
+    ]

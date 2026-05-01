@@ -5,10 +5,9 @@ import logging
 from typing import Any
 
 from ...core.exceptions import ProviderError, ReportNotFoundError
-from ...schema.models import MarketResult, ReportReference
-from ..base import BaseProvider, ProviderCapability
-from ...schema.models import Auction
-from .parsers import parse_market_result, parse_report_list
+from ...schema.models import Auction, ReportReference
+from ..base import BaseProvider
+from .parsers import MarketResult, parse_market_result, parse_report_list
 
 _log = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ class SemopxProvider(BaseProvider):
 
     name = "semopx"
     base_url = "https://reports.semopx.com"
-    capabilities = frozenset({ProviderCapability.MARKET_RESULTS})
 
     def list_reports(
         self,
@@ -70,13 +68,13 @@ class SemopxProvider(BaseProvider):
     def get_market_result(self, auction: Auction, delivery_date: dt.date) -> MarketResult:
         auction_id = _SEMOPX_AUCTION_ID[auction]
         prefix = f"MarketResult_{auction_id}_"
-        refs = self.list_reports(date_from=delivery_date, date_to=delivery_date + dt.timedelta(days=1), search_name=prefix)
+        refs = self.list_reports(
+            date_from=delivery_date, date_to=delivery_date + dt.timedelta(days=1), search_name=prefix
+        )
         matches = [r for r in refs if r.resource_name.startswith(prefix) and r.date == delivery_date]
 
         if not matches:
-            raise ReportNotFoundError(
-                f"No market result report for {auction!r} on {delivery_date}"
-            )
+            raise ReportNotFoundError(f"No market result report for {auction!r} on {delivery_date}")
 
         if len(matches) > 1:
             _log.warning(

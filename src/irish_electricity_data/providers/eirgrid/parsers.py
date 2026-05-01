@@ -13,6 +13,7 @@ _FIELD_NAME_TO_LABEL: dict[str, str] = {
     "SYSTEM_DEMAND": "Demand",
 }
 
+
 _INTER_FIELD_TO_NAME: dict[str, str] = {
     "INTER_EWIC": "EWIC",
     "INTER_GRNLK": "GREENLINK",
@@ -31,18 +32,22 @@ def _parse_effective_time(value: str) -> dt.datetime:
     return naive.replace(tzinfo=TZ_DUBLIN).astimezone(TZ_UTC)
 
 
-def parse_outturn(payload: dict[str, Any]) -> list[Series]:
-    """Parse an EirGrid chart-API response into one Series per (Region, variable).
+def _parse(payload: dict[str, Any], field_label_map: dict) -> list[Series]:
+    """Parse a response from the EirGrid dashboard API into one Series per (Region, Variable).
+    Rows in the response with an unknown `FieldName` or `Value` are dropped.
 
-    Rows are grouped by `(Region, FieldName)` and sorted by timestamp. Rows with
-    unknown FieldNames or a null `Value` are dropped.
+    Args:
+        payload (dict[str, Any]): The JSON response.
+        field_label_map (dict): A mapping for the FieldName attribute in payload records.
+
+    Returns:
+        list[Series]:
     """
     rows = payload.get("Rows", [])
     by_key: dict[tuple[str, str], list[DataPoint]] = defaultdict(list)
 
     for row in rows:
-        field = row.get("FieldName")
-        name = _FIELD_NAME_TO_LABEL.get(field)
+        name = field_label_map.get(row.get("FieldName"))
         if name is None:
             continue
 
@@ -50,44 +55,20 @@ def parse_outturn(payload: dict[str, Any]) -> list[Series]:
         if value is None:
             continue
 
-        point = DataPoint(
-            timestamp=_parse_effective_time(row["EffectiveTime"]),
-            value=value,
-        )
+        point = DataPoint(timestamp=_parse_effective_time(row["EffectiveTime"]), value=value)
         by_key[(row["Region"], name)].append(point)
 
     series: list[Series] = []
-    for (region, name), points in sorted(by_key.items()):
+    for (region, name), points in by_key.items():
         points.sort(key=lambda p: p.timestamp)
         series.append(Series(area=region, name=name, frequency=15, unit="MW", data=points))
+
     return series
 
 
-def parse_interconnector_flows(payload: dict[str, Any]) -> list[Series]:
-    """Parse an EirGrid interconnection API response into one Series per (Region, name).
+def parse_outturn(payload: dict[str, Any]):
+    return _parse(payload, _FIELD_NAME_TO_LABEL)
 
-    Known FieldNames: INTER_EWIC → EWIC (ROI), INTER_GRNLK → GREENLINK (ROI),
-    INTER_MOYLE → MOYLE (NI), INTER_NET → Net (ALL). Unknown fields are dropped.
-    Rows with a null Value are dropped.
-    """
-    rows = payload.get("Rows", [])
-    by_key: dict[tuple[str, str], list[DataPoint]] = defaultdict(list)
 
-    for row in rows:
-        name = _INTER_FIELD_TO_NAME.get(row.get("FieldName"))
-        if name is None:
-            continue
-        value = row.get("Value")
-        if value is None:
-            continue
-        point = DataPoint(
-            timestamp=_parse_effective_time(row["EffectiveTime"]),
-            value=value,
-        )
-        by_key[(row["Region"], name)].append(point)
-
-    series: list[Series] = []
-    for (region, name), points in sorted(by_key.items()):
-        points.sort(key=lambda p: p.timestamp)
-        series.append(Series(area=region, name=name, frequency=15, unit="MW", data=points))
-    return series
+def parse_interconnector_flows(payload: dict[str, Any]):
+    return _parse(payload, _INTER_FIELD_TO_NAME)

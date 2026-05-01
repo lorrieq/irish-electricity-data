@@ -10,7 +10,7 @@ UTC = ZoneInfo("UTC")
 
 
 def test_parse_outturn_groups_by_region_and_variable():
-    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid_outturn_sample.json"
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "outturn_sample.json"
     payload = json.loads(fixture_path.read_text())
 
     result = parse_outturn(payload)
@@ -40,7 +40,7 @@ def test_parse_outturn_groups_by_region_and_variable():
 
 
 def test_parse_interconnector_flows():
-    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid_interconnection_sample.json"
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "interconnection_sample.json"
     payload = json.loads(fixture_path.read_text())
 
     result = parse_interconnector_flows(payload)

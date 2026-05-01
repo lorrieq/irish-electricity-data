@@ -5,9 +5,8 @@ from pathlib import Path
 import pytest
 
 from irish_electricity_data.core.exceptions import ReportNotFoundError
-from irish_electricity_data.schema import Auction
 from irish_electricity_data.providers.semopx import SemopxProvider, parse_report_list
-from irish_electricity_data.schema import ReportReference
+from irish_electricity_data.schema import Auction, ReportReference
 
 
 @pytest.fixture
@@ -62,7 +61,7 @@ def _make_ref(resource_name: str, publish_time: dt.datetime, delivery_date: dt.d
 
 
 _DELIVERY = dt.date(2026, 4, 20)
-_FIXTURE_CONTENT = (Path(__file__).parent / "fixtures" / "semopx_market_result_day_ahead.csv").read_text()
+_FIXTURE_CONTENT = (Path(__file__).parent / "fixtures" / "semopx" / "market_result_day_ahead.csv").read_text()
 
 
 def test_get_market_result(monkeypatch):

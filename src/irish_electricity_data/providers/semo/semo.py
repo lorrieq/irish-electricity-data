@@ -1,23 +1,23 @@
 from __future__ import annotations
 
 import datetime as dt
-from enum import StrEnum
 from typing import Any
 
 from ...core.constants import TZ_UTC
 from ...core.exceptions import ProviderError
-from ...schema.models import (
-    Auction,
+from ...schema.models import Auction, ReportReference
+from ..base import BaseProvider
+from .parsers import (
     AuctionResult,
+    DailyMeterData,
+    HrlyForecastImbalance,
     ImbalancePriceReport,
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
     PhysicalNotification,
-    ReportReference,
-)
-from ..base import BaseProvider, ProviderCapability
-from .parsers import (
     parse_auction_report,
+    parse_daily_meter_data_report,
+    parse_hrly_forecast_imbalance_report,
     parse_imbalance_price_report,
     parse_imbalance_price_supp_info_report,
     parse_imbalance_settlement_report,
@@ -47,19 +47,11 @@ def _datetime_from_resource_name(resource_name: str) -> dt.datetime | None:
         return None
 
 
-class _DPuG(StrEnum):
-    PHYSICAL_NOTIFICATIONS = "BM-023"
-    IMBALANCE_PRICE = "BM-025"
-    IMBALANCE_SETTLEMENT = "BM-026"
-    IMBALANCE_PRICE_SUPP_INFO = "BM-027"
-
-
 class SemoProvider(BaseProvider):
     """SEMO static-reports provider (reports.sem-o.com)."""
 
     name = "semo"
     base_url = "https://reports.sem-o.com"
-    capabilities = frozenset({ProviderCapability.AUCTION_RESULTS})
 
     def list_reports(
         self,
@@ -102,10 +94,6 @@ class SemoProvider(BaseProvider):
         """Fetch the raw text body of a report (XML, CSV, etc) by resource name."""
         return self._get_text(f"/documents/{resource_name}")
 
-    def get_auction_result(self, report_id: str) -> AuctionResult:
-        """Fetch and parse a single auction report by report id."""
-        return parse_auction_report(self.fetch_report(report_id))
-
     def get_auction_results(
         self,
         auction: Auction,
@@ -125,7 +113,6 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("DPuG_ID", "EA-001"),
                 ("order_by", "DESC"),
                 ("sort_by", "Date"),
                 ("ExcludeDelayedPublication", 0),
@@ -135,11 +122,9 @@ class SemoProvider(BaseProvider):
             ]
         )
         latest = _latest_by_delivery_date(refs, start_date, end_date)
-        return [self.get_auction_result(ref.id) for ref in sorted(latest.values(), key=lambda r: r.date)]
-
-    def get_physical_notifications_report(self, resource_name: str) -> list[PhysicalNotification]:
-        """Fetch and parse a single daily final physical notifications report."""
-        return parse_physical_notifications_report(self.fetch_raw_report(resource_name))
+        return [
+            parse_auction_report(self.fetch_report(ref.id)) for ref in sorted(latest.values(), key=lambda r: r.date)
+        ]
 
     def get_physical_notifications(
         self,
@@ -157,7 +142,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("DPuG_ID", _DPuG.PHYSICAL_NOTIFICATIONS),
+                ("ReportName", "PUB_DailyFinalPhysicalNotifications"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start_date.strftime("%Y-%m-%d")),
@@ -168,14 +153,10 @@ class SemoProvider(BaseProvider):
         rows = [
             row
             for ref in sorted(latest.values(), key=lambda r: r.date)
-            for row in self.get_physical_notifications_report(ref.resource_name)
+            for row in parse_physical_notifications_report(self.fetch_raw_report(ref.resource_name))
         ]
         rows.sort(key=lambda r: r.start_time)
         return rows
-
-    def get_imbalance_price_report(self, resource_name: str) -> ImbalancePriceReport:
-        """Fetch and parse a single 5-minute imbalance price report."""
-        return parse_imbalance_price_report(self.fetch_raw_report(resource_name))
 
     def get_imbalance_prices(
         self,
@@ -190,7 +171,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("DPuG_ID", _DPuG.IMBALANCE_PRICE),
+                ("ReportName", "PUB_5MinImbalPrc"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start.date().strftime("%Y-%m-%d")),
@@ -200,13 +181,9 @@ class SemoProvider(BaseProvider):
         refs = [
             r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
-        reports = [self.get_imbalance_price_report(r.resource_name) for r in refs]
+        reports = [parse_imbalance_price_report(self.fetch_raw_report(r.resource_name)) for r in refs]
         reports.sort(key=lambda r: r.start_time)
         return reports
-
-    def get_imbalance_price_supp_info_report(self, resource_name: str) -> list[ImbalancePriceSuppInfo]:
-        """Fetch and parse a single 5-minute imbalance price supplementary info report."""
-        return parse_imbalance_price_supp_info_report(self.fetch_raw_report(resource_name))
 
     def get_imbalance_price_supp_infos(
         self,
@@ -221,7 +198,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("DPuG_ID", _DPuG.IMBALANCE_PRICE_SUPP_INFO),
+                ("ReportName", "PUB_5MinImbalPrcSuppInfo"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start.date().strftime("%Y-%m-%d")),
@@ -231,13 +208,75 @@ class SemoProvider(BaseProvider):
         refs = [
             r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
-        rows = [row for r in refs for row in self.get_imbalance_price_supp_info_report(r.resource_name)]
+        rows = [
+            row for r in refs for row in parse_imbalance_price_supp_info_report(self.fetch_raw_report(r.resource_name))
+        ]
         rows.sort(key=lambda r: r.start_time)
         return rows
 
-    def get_imbalance_settlement_report(self, resource_name: str) -> ImbalanceSettlementReport:
-        """Fetch and parse a single 30-minute imbalance settlement report."""
-        return parse_imbalance_settlement_report(self.fetch_raw_report(resource_name))
+    def get_daily_meter_data(
+        self,
+        start_date: dt.date,
+        end_date: dt.date | None = None,
+    ) -> list[DailyMeterData]:
+        """Get D1 daily meter data by trade date, inclusive on both ends, sorted by start_time.
+
+        Deduplicates to the latest-published report per trade date before fetching.
+        """
+        if end_date is None:
+            end_date = start_date
+        if end_date < start_date:
+            raise ValueError("end_date must be on or after start_date")
+
+        refs = self.list_reports(
+            [
+                ("ReportName", "PUB_DailyMeterDataD1"),
+                ("sort_by", "PublishTime"),
+                ("order_by", "DESC"),
+                ("date_from", start_date.strftime("%Y-%m-%d")),
+                ("date_to", end_date.strftime("%Y-%m-%d")),
+            ]
+        )
+        latest = _latest_by_delivery_date(refs, start_date, end_date)
+        rows = [
+            row
+            for ref in sorted(latest.values(), key=lambda r: r.date)
+            for row in parse_daily_meter_data_report(self.fetch_raw_report(ref.resource_name))
+        ]
+        rows.sort(key=lambda r: r.start_time)
+        return rows
+
+    def get_hrly_forecast_imbalances(
+        self,
+        start_date: dt.date,
+        end_date: dt.date | None = None,
+    ) -> list[HrlyForecastImbalance]:
+        """Get hourly forecast imbalances by trade date, inclusive on both ends, sorted by start_time.
+
+        Deduplicates to the latest-published report per trade date before fetching.
+        """
+        if end_date is None:
+            end_date = start_date
+        if end_date < start_date:
+            raise ValueError("end_date must be on or after start_date")
+
+        refs = self.list_reports(
+            [
+                ("ReportName", "PUB_HrlyForecastImbalance"),
+                ("sort_by", "PublishTime"),
+                ("order_by", "DESC"),
+                ("date_from", start_date.strftime("%Y-%m-%d")),
+                ("date_to", end_date.strftime("%Y-%m-%d")),
+            ]
+        )
+        latest = _latest_by_delivery_date(refs, start_date, end_date)
+        rows = [
+            row
+            for ref in sorted(latest.values(), key=lambda r: r.date)
+            for row in parse_hrly_forecast_imbalance_report(self.fetch_raw_report(ref.resource_name))
+        ]
+        rows.sort(key=lambda r: r.start_time)
+        return rows
 
     def get_imbalance_settlements(
         self,
@@ -252,7 +291,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("DPuG_ID", _DPuG.IMBALANCE_SETTLEMENT),
+                ("ReportName", "PUB_30MinAvgImbalPrc"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start.date().strftime("%Y-%m-%d")),
@@ -262,7 +301,7 @@ class SemoProvider(BaseProvider):
         refs = [
             r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
-        reports = [self.get_imbalance_settlement_report(r.resource_name) for r in refs]
+        reports = [parse_imbalance_settlement_report(self.fetch_raw_report(r.resource_name)) for r in refs]
         reports.sort(key=lambda r: r.start_time)
         return reports
 

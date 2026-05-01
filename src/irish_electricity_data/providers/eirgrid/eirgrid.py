@@ -5,7 +5,7 @@ from enum import StrEnum
 
 from ...core.exceptions import ProviderError
 from ...schema.models import Series
-from ..base import BaseProvider, ProviderCapability
+from ..base import BaseProvider
 from .parsers import parse_interconnector_flows, parse_outturn
 
 
@@ -38,15 +38,6 @@ class EirGridProvider(BaseProvider):
 
     name = "eirgrid"
     base_url = "https://www.smartgriddashboard.com"
-    capabilities = frozenset(
-        {
-            ProviderCapability.GENERATION,
-            ProviderCapability.DEMAND,
-            ProviderCapability.WIND,
-            ProviderCapability.SOLAR,
-            ProviderCapability.INTERCONNECTOR,
-        }
-    )
 
     def get_outturn(
         self,
