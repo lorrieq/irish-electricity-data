@@ -53,8 +53,12 @@ def test_parse_auction_report():
     result = parse_auction_report(report_content)
 
     assert isinstance(result, AuctionResult)
-    assert len(result.series) > 0
-    assert all(isinstance(series, Series) for series in result.series)
+    assert result.price_eur[0].value == 180
+    assert result.price_gbp[0].value == 156.99
+    assert result.ni_volumes[0].value == 794.3
+    assert result.ni_net_position[0].value == 76.8
+    assert result.roi_volumes[0].value == 3848.6
+    assert result.roi_net_position[0].value == -76.8
 
 
 def test_parse_imbalance_price_report():

@@ -2,20 +2,25 @@ from __future__ import annotations
 
 import datetime as dt
 
-from ...schema.models import DataPoint, Series, _FrozenModel
+from ...schema.models import DataPoint, _FrozenModel
 
 
 class AuctionResult(_FrozenModel):
-    """Parsed SEMO auction report: prices, volumes, net positions across NI/ROI."""
+    """Represents an auction result with prices, volumes and net positions across NI/ROI."""
 
     auction_date: dt.datetime | None = None
     delivery_date: dt.date | None = None
     publish_time: dt.datetime | None = None
-    series: list[Series]
+    price_eur: list[DataPoint]
+    price_gbp: list[DataPoint]
+    ni_volumes: list[DataPoint]
+    ni_net_position: list[DataPoint]
+    roi_volumes: list[DataPoint]
+    roi_net_position: list[DataPoint]
 
 
 class ImbalancePriceReport(_FrozenModel):
-    """A single 5-minute imbalance-pricing period from SEMO (DPuG BM-025)."""
+    """Represents a 5-minute imbalance price period."""
 
     trade_date: dt.date
     start_time: dt.datetime
@@ -36,11 +41,7 @@ class ImbalancePriceReport(_FrozenModel):
 
 
 class ImbalanceSettlementReport(_FrozenModel):
-    """A 30-minute imbalance settlement period from SEMO (DPuG BM-026).
-
-    This is the settlement price — the volume-weighted average of the six 5-minute
-    imbalance pricing periods in the half hour.
-    """
+    """Represents a 30-minute imbalance settlement period."""
 
     trade_date: dt.date
     start_time: dt.datetime
@@ -51,11 +52,7 @@ class ImbalanceSettlementReport(_FrozenModel):
 
 
 class ImbalancePriceSuppInfo(_FrozenModel):
-    """A single BOA row from a 5-minute imbalance price supplementary info report.
-
-    Each file covers one 5-minute period and contains one row per bid/offer acceptance
-    that contributed to the imbalance price calculation.
-    """
+    """Represents a bid/offer acceptance (BOA) from a 5-minute imbalance price supplementary info period."""
 
     trade_date: dt.date
     start_time: dt.datetime
@@ -79,7 +76,7 @@ class ImbalancePriceSuppInfo(_FrozenModel):
 
 
 class HrlyForecastImbalance(_FrozenModel):
-    """A single row from a hourly forecast imbalance report (PUB_HrlyForecastImbalance)."""
+    """Represents an hourly forecast imbalance period."""
 
     publish_time: dt.datetime
     start_time: dt.datetime
@@ -91,7 +88,7 @@ class HrlyForecastImbalance(_FrozenModel):
 
 
 class DailyMeterData(_FrozenModel):
-    """A single 30-minute metering interval from a D1 daily meter data report."""
+    """Represents a 30-minute D1 metering interval."""
 
     resource_name: str
     start_time: dt.datetime
@@ -100,7 +97,7 @@ class DailyMeterData(_FrozenModel):
 
 
 class PhysicalNotification(_FrozenModel):
-    """A single row from a daily final physical notifications report (DPuG BM-023)."""
+    """Represents a row of FPN data."""
 
     resource_name: str
     start_time: dt.datetime
@@ -119,6 +116,8 @@ class Forecast(_FrozenModel):
 
 
 class LTSReport(_FrozenModel):
+    """Represents a row from the LTS operational schedule."""
+
     publish_time: dt.datetime
     resource_name: str
     start_time: dt.datetime

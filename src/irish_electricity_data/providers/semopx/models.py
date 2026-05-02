@@ -6,7 +6,7 @@ from ...schema.models import DataPoint, _FrozenModel
 
 
 class PortfolioPosition(_FrozenModel):
-    """A single participant/unit's cleared position timeseries from a market result."""
+    """Represents a single participant/unit cleared position timeseries within a market result."""
 
     participant: str
     unit_id: str
@@ -16,7 +16,7 @@ class PortfolioPosition(_FrozenModel):
 
 
 class MarketResult(_FrozenModel):
-    """Parsed SEMOpx market result: per-portfolio cleared positions."""
+    """Parsed SEMOpx auction market result containing per-portfolio cleared positions."""
 
     auction: str | None = None
     auction_name: str | None = None
@@ -26,6 +26,8 @@ class MarketResult(_FrozenModel):
 
 
 class InterconnectorFlow(_FrozenModel):
+    """Represents a single interconnector flow interval."""
+
     interconnector: str
     direction: str
     timestamp: dt.datetime

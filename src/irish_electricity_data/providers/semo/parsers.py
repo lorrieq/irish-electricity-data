@@ -72,18 +72,11 @@ def parse_series_chunk(area: str, data: _SeriesRow) -> Series:
     return Series(area=area, name=series_name, frequency=frequency, unit=unit, data=points)
 
 
-_SERIES_TO_EXTRACT: list[tuple[str, str | None]] = [
-    ("Index prices", "EUR"),
-    ("Index prices", "GBP"),
-    ("Index volumes", None),
-    ("Net position", None),
-]
-
-
 def parse_auction_report(report_content: dict[str, Any]) -> AuctionResult:
     """Parse a SEMO auction report payload into an AuctionResult.
 
     Top-level payload keys: AuctionDate, PublishTime, rows (list of per-area row groups).
+    Raises ParseError if areas other than NI/ROI are present, or if either is missing.
     """
     rows = report_content.get("rows")
     if not rows:
@@ -93,18 +86,38 @@ def parse_auction_report(report_content: dict[str, Any]) -> AuctionResult:
     publish_time = _maybe_datetime(report_content.get("PublishTime"))
     delivery_date = _maybe_date(report_content.get("Date"))
 
-    series: list[Series] = []
+    price_eur: list[DataPoint] | None = None
+    price_gbp: list[DataPoint] | None = None
+    area_data: dict[str, dict[str, list[DataPoint]]] = {}
+
     for area_rows in rows:
         area = area_rows[0][1].split("-")[0]
-        for name, extra_match in _SERIES_TO_EXTRACT:
-            chunk = extract_series_chunk(name, area_rows, extra_match=extra_match)
-            series.append(parse_series_chunk(area, chunk))
+        if area not in ("NI", "ROI"):
+            raise ParseError(f"unexpected area {area!r} in auction report")
+
+        if price_eur is None:
+            price_eur = parse_series_chunk(area, extract_series_chunk("Index prices", area_rows, extra_match="EUR")).data
+            price_gbp = parse_series_chunk(area, extract_series_chunk("Index prices", area_rows, extra_match="GBP")).data
+
+        area_data[area] = {
+            "volumes": parse_series_chunk(area, extract_series_chunk("Index volumes", area_rows)).data,
+            "net_position": parse_series_chunk(area, extract_series_chunk("Net position", area_rows)).data,
+        }
+
+    for required in ("NI", "ROI"):
+        if required not in area_data:
+            raise ParseError(f"area {required!r} missing from auction report")
 
     return AuctionResult(
         auction_date=auction_date,
         delivery_date=delivery_date,
         publish_time=publish_time,
-        series=series,
+        price_eur=price_eur,
+        price_gbp=price_gbp,
+        ni_volumes=area_data["NI"]["volumes"],
+        ni_net_position=area_data["NI"]["net_position"],
+        roi_volumes=area_data["ROI"]["volumes"],
+        roi_net_position=area_data["ROI"]["net_position"],
     )
 
 
