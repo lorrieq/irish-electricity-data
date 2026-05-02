@@ -6,36 +6,8 @@ from xml.etree import ElementTree as ET
 
 from ...core.constants import TZ_UTC
 from ...core.exceptions import ParseError
-from ...schema.models import DataPoint, ReportReference, _FrozenModel
-
-
-class PortfolioPosition(_FrozenModel):
-    """A single participant/unit's cleared position timeseries from a market result."""
-
-    participant: str
-    unit_id: str
-    order_type: str
-    user: str
-    positions: list[DataPoint]
-
-
-class MarketResult(_FrozenModel):
-    """Parsed SEMOpx market result: per-portfolio cleared positions."""
-
-    auction: str | None = None
-    auction_name: str | None = None
-    auction_datetime: dt.datetime | None = None
-    publication_datetime: dt.datetime | None = None
-    portfolios: list[PortfolioPosition]
-
-
-class InterconnectorFlow(_FrozenModel):
-    interconnector: str
-    direction: str
-    timestamp: dt.datetime
-    scheduled: float
-    total_scheduled: float
-    publish_time: dt.datetime
+from ...schema.models import DataPoint, ReportReference
+from .models import InterconnectorFlow, MarketResult, PortfolioPosition
 
 
 def parse_report_list(items: list[dict[str, Any]]) -> list[ReportReference]:
@@ -112,7 +84,7 @@ def parse_interconnector_flows(xml: str) -> list[InterconnectorFlow]:
         root = ET.fromstring(xml)
     except ET.ParseError as exc:
         raise ParseError(f"Invalid XML: {exc}") from exc
-    
+
     ns = {"ns": "http://amp.unicorn.eu/xsd/InterconnectorFlowCapacityDocument.xsd"}
 
     publish_time_elem = root.find("ns:CreationDateTime", namespaces=ns)
@@ -126,7 +98,7 @@ def parse_interconnector_flows(xml: str) -> list[InterconnectorFlow]:
     for row in rows:
         period = row.find("ns:Period", ns)
         time_interval = period.find("ns:TimeInterval", ns).attrib["v"]
-        start, end = [dt.datetime.fromisoformat(x) for x in time_interval.split("/")]
+        _, end = [dt.datetime.fromisoformat(x) for x in time_interval.split("/")]
         end -= dt.timedelta(minutes=30)  # bring back to last period
 
         intervals = period.findall("ns:Interval", namespaces=ns)
@@ -138,15 +110,17 @@ def parse_interconnector_flows(xml: str) -> list[InterconnectorFlow]:
             initial_timestamp = dt.datetime.combine(end.date(), dt.time(hour, minute), tzinfo=TZ_UTC)
             timestamp = initial_timestamp - dt.timedelta(days=1) if initial_timestamp > end else initial_timestamp
 
-            data.append(InterconnectorFlow(
-                interconnector=row.find("ns:Interconnector", ns).attrib["v"],
-                direction=row.find("ns:InterconnectorDirection", ns).attrib["v"],
-                timestamp=timestamp,
-                scheduled=interval.find("ns:Scheduled", ns).attrib["v"],
-                total_scheduled=interval.find("ns:TotalScheduled", ns).attrib["v"],
-                publish_time=publish_time
-            ))
-    
+            data.append(
+                InterconnectorFlow(
+                    interconnector=row.find("ns:Interconnector", ns).attrib["v"],
+                    direction=row.find("ns:InterconnectorDirection", ns).attrib["v"],
+                    timestamp=timestamp,
+                    scheduled=interval.find("ns:Scheduled", ns).attrib["v"],
+                    total_scheduled=interval.find("ns:TotalScheduled", ns).attrib["v"],
+                    publish_time=publish_time,
+                )
+            )
+
     return data
 
 

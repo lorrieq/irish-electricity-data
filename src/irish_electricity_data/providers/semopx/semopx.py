@@ -7,7 +7,8 @@ from typing import Any
 from ...core.exceptions import ProviderError, ReportNotFoundError
 from ...schema.models import Auction, ReportReference
 from ..base import BaseProvider
-from .parsers import MarketResult, parse_market_result, parse_report_list
+from .models import MarketResult
+from .parsers import parse_market_result, parse_report_list
 
 _log = logging.getLogger(__name__)
 

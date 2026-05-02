@@ -7,7 +7,7 @@ from ...core.constants import TZ_UTC
 from ...core.exceptions import ProviderError
 from ...schema.models import Auction, ReportReference
 from ..base import BaseProvider
-from .parsers import (
+from .models import (
     AuctionResult,
     DailyMeterData,
     HrlyForecastImbalance,
@@ -15,6 +15,8 @@ from .parsers import (
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
     PhysicalNotification,
+)
+from .parsers import (
     parse_auction_report,
     parse_daily_meter_data_report,
     parse_hrly_forecast_imbalance_report,

@@ -2,8 +2,12 @@ import datetime as dt
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from irish_electricity_data.providers.semopx import parse_interconnector_flows, parse_market_result
-from irish_electricity_data.providers.semopx import InterconnectorFlow, MarketResult
+from irish_electricity_data.providers.semopx import (
+    InterconnectorFlow,
+    MarketResult,
+    parse_interconnector_flows,
+    parse_market_result,
+)
 
 
 def test_parse_market_result():

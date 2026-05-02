@@ -1,4 +1,4 @@
-from .parsers import (
+from .models import (
     AuctionResult,
     DailyMeterData,
     Forecast,
@@ -8,6 +8,8 @@ from .parsers import (
     ImbalanceSettlementReport,
     LTSReport,
     PhysicalNotification,
+)
+from .parsers import (
     parse_auction_report,
     parse_daily_meter_data_report,
     parse_hrly_forecast_imbalance_report,
