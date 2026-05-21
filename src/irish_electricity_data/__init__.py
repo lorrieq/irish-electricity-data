@@ -29,9 +29,7 @@ from .providers.semopx import MarketResult, PortfolioPosition
 from .schema import (
     Auction,
     DataPoint,
-    DataStatus,
     ReportReference,
-    Series,
 )
 
 __all__ = [
@@ -39,7 +37,6 @@ __all__ = [
     "AuctionResult",
     "BaseProvider",
     "DataPoint",
-    "DataStatus",
     "EirGridProvider",
     "ImbalancePriceReport",
     "ImbalancePriceSuppInfo",
@@ -60,7 +57,6 @@ __all__ = [
     "RetryPolicy",
     "SemoProvider",
     "SemopxProvider",
-    "Series",
     "TimezoneAmbiguityError",
     "Variable",
 ]

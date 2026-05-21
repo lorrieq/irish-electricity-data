@@ -6,7 +6,7 @@ from xml.etree import ElementTree as ET
 
 from ...core.constants import TZ_UTC
 from ...core.exceptions import ParseError
-from ...schema.models import DataPoint, ReportReference, Series
+from ...schema.models import DataPoint, ReportReference
 from .models import (
     AuctionResult,
     DailyMeterData,
@@ -55,70 +55,11 @@ def extract_series_chunk(
     return data[start_index : start_index + 3]
 
 
-def parse_series_chunk(area: str, data: _SeriesRow) -> Series:
-    """Parse a 3-row series chunk (header / timestamps / values) into a Series.
-
-    Header row layout: [name, frequency, unit?]
-    """
-    header = data[0]
-    series_name = header[0]
-    frequency = header[1]
-    unit = header[2] if len(header) > 2 else None
-
+def parse_series_chunk(data: _SeriesRow) -> list[DataPoint]:
+    """Parse a 3-row series chunk (header / timestamps / values) into a list of DataPoints."""
     timestamps = [dt.datetime.fromisoformat(x) for x in data[1]]
     values = data[2]
-
-    points = [DataPoint(timestamp=t, value=v) for t, v in zip(timestamps, values, strict=False)]
-    return Series(area=area, name=series_name, frequency=frequency, unit=unit, data=points)
-
-
-def parse_auction_report(report_content: dict[str, Any]) -> AuctionResult:
-    """Parse a SEMO auction report payload into an AuctionResult.
-
-    Top-level payload keys: AuctionDate, PublishTime, rows (list of per-area row groups).
-    Raises ParseError if areas other than NI/ROI are present, or if either is missing.
-    """
-    rows = report_content.get("rows")
-    if not rows:
-        raise ParseError("auction report missing 'rows'")
-
-    auction_date = _maybe_datetime(report_content.get("AuctionDate"))
-    publish_time = _maybe_datetime(report_content.get("PublishTime"))
-    delivery_date = _maybe_date(report_content.get("Date"))
-
-    price_eur: list[DataPoint] | None = None
-    price_gbp: list[DataPoint] | None = None
-    area_data: dict[str, dict[str, list[DataPoint]]] = {}
-
-    for area_rows in rows:
-        area = area_rows[0][1].split("-")[0]
-        if area not in ("NI", "ROI"):
-            raise ParseError(f"unexpected area {area!r} in auction report")
-
-        if price_eur is None:
-            price_eur = parse_series_chunk(area, extract_series_chunk("Index prices", area_rows, extra_match="EUR")).data
-            price_gbp = parse_series_chunk(area, extract_series_chunk("Index prices", area_rows, extra_match="GBP")).data
-
-        area_data[area] = {
-            "volumes": parse_series_chunk(area, extract_series_chunk("Index volumes", area_rows)).data,
-            "net_position": parse_series_chunk(area, extract_series_chunk("Net position", area_rows)).data,
-        }
-
-    for required in ("NI", "ROI"):
-        if required not in area_data:
-            raise ParseError(f"area {required!r} missing from auction report")
-
-    return AuctionResult(
-        auction_date=auction_date,
-        delivery_date=delivery_date,
-        publish_time=publish_time,
-        price_eur=price_eur,
-        price_gbp=price_gbp,
-        ni_volumes=area_data["NI"]["volumes"],
-        ni_net_position=area_data["NI"]["net_position"],
-        roi_volumes=area_data["ROI"]["volumes"],
-        roi_net_position=area_data["ROI"]["net_position"],
-    )
+    return [DataPoint(timestamp=t, value=v) for t, v in zip(timestamps, values, strict=False)]
 
 
 def _maybe_datetime(value: str | None) -> dt.datetime | None:
@@ -150,6 +91,111 @@ def _yn_to_bool(value: str) -> bool:
 def _parse_aware_utc(value: str) -> dt.datetime:
     """SEMO publishes naive ISO timestamps in UTC; make that explicit."""
     return dt.datetime.fromisoformat(value.replace("Z", "")).replace(tzinfo=TZ_UTC)
+
+
+def parse_auction_report(report_content: dict[str, Any]) -> AuctionResult:
+    """Parse a SEMO auction report payload into an AuctionResult.
+
+    Top-level payload keys: AuctionDate, PublishTime, rows (list of per-area row groups).
+    Raises ParseError if areas other than NI/ROI are present, or if either is missing.
+    """
+    rows = report_content.get("rows")
+    if not rows:
+        raise ParseError("auction report missing 'rows'")
+
+    auction_date = _maybe_datetime(report_content.get("AuctionDate"))
+    publish_time = _maybe_datetime(report_content.get("PublishTime"))
+    delivery_date = _maybe_date(report_content.get("Date"))
+
+    price_eur: list[DataPoint] | None = None
+    price_gbp: list[DataPoint] | None = None
+    area_data: dict[str, dict[str, list[DataPoint]]] = {}
+
+    for area_rows in rows:
+        area = area_rows[0][1].split("-")[0]
+        if area not in ("NI", "ROI"):
+            raise ParseError(f"unexpected area {area!r} in auction report")
+
+        if price_eur is None:
+            price_eur = parse_series_chunk(extract_series_chunk("Index prices", area_rows, extra_match="EUR"))
+            price_gbp = parse_series_chunk(extract_series_chunk("Index prices", area_rows, extra_match="GBP"))
+
+        area_data[area] = {
+            "volumes": parse_series_chunk(extract_series_chunk("Index volumes", area_rows)),
+            "net_position": parse_series_chunk(extract_series_chunk("Net position", area_rows)),
+        }
+
+    for required in ("NI", "ROI"):
+        if required not in area_data:
+            raise ParseError(f"area {required!r} missing from auction report")
+
+    return AuctionResult(
+        auction_date=auction_date,
+        delivery_date=delivery_date,
+        publish_time=publish_time,
+        price_eur=price_eur,
+        price_gbp=price_gbp,
+        ni_volumes=area_data["NI"]["volumes"],
+        ni_net_position=area_data["NI"]["net_position"],
+        roi_volumes=area_data["ROI"]["volumes"],
+        roi_net_position=area_data["ROI"]["net_position"],
+    )
+
+
+def parse_daily_meter_data_report(xml: str) -> list[DailyMeterData]:
+    """Parse a `PUB_DailyMeterDataD1_*.xml` payload into a list of `DailyMeterData` rows.
+
+    Each file covers one trade day; rows represent 30-minute metering intervals per resource.
+    """
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"invalid XML: {exc}") from exc
+
+    rows = root.findall("PUB_DailyMeterDataD1")
+    if not rows:
+        raise ParseError("meter data report missing <PUB_DailyMeterDataD1> elements")
+
+    return [
+        DailyMeterData(
+            resource_name=row.attrib["ResourceName"],
+            start_time=_parse_aware_utc(row.attrib["StartTime"]),
+            metered_mw=float(row.attrib["MeteredMW"]),
+        )
+        for row in rows
+    ]
+
+
+def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance]:
+    """Parse a `PUB_HrlyForecastImbalance_*.xml` payload into a list of rows.
+
+    Each file covers one trade day; rows represent individual half-hour forecast
+    imbalance periods.
+    """
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"invalid XML: {exc}") from exc
+
+    publish_time = _parse_aware_utc(root.attrib["PublishTime"])
+
+    rows = root.findall("PUB_HrlyForecastImbalance")
+    if not rows:
+        raise ParseError("forecast imbalance report missing <PUB_HrlyForecastImbalance> elements")
+
+    return [
+        HrlyForecastImbalance(
+            publish_time=publish_time,
+            start_time=_parse_aware_utc(a["StartTime"]),
+            total_pn=float(a["TotalPN"]),
+            net_interconnector_schedule=float(a["NetInterconnectorSchedule"]),
+            tso_demand_forecast=float(a["TSODemandForecast"]),
+            tso_renewable_forecast=float(a["TSORenewableForecast"]),
+            calculated_imbalance=float(a["CalculatedImbalance"]),
+        )
+        for row in rows
+        for a in (row.attrib,)
+    ]
 
 
 def parse_imbalance_price_report(xml: str) -> ImbalancePriceReport:
@@ -188,91 +234,6 @@ def parse_imbalance_price_report(xml: str) -> ImbalancePriceReport:
         short_term_reserve_quantity=float(a["ShortTermReserveQuantity"]),
         operating_reserve_requirement=float(a["OperatingReserveRequirement"]),
     )
-
-
-def parse_imbalance_settlement_report(xml: str) -> ImbalanceSettlementReport:
-    """Parse a `PUB_30MinAvgImbalPrc_*.xml` payload into an `ImbalanceSettlementReport`.
-
-    Each file is one 30-minute settlement period with net imbalance volume and the
-    volume-weighted settlement price, inside a `<PUB_30MinAvgImbalPrc>` element.
-    """
-    try:
-        root = ET.fromstring(xml)
-    except ET.ParseError as exc:
-        raise ParseError(f"invalid XML: {exc}") from exc
-
-    publish_time = _parse_aware_utc(root.attrib["PublishTime"])
-
-    row = root.find("PUB_30MinAvgImbalPrc")
-    if row is None:
-        raise ParseError("settlement report missing <PUB_30MinAvgImbalPrc> element")
-
-    a = row.attrib
-    return ImbalanceSettlementReport(
-        trade_date=dt.date.fromisoformat(a["TradeDate"]),
-        start_time=_parse_aware_utc(a["StartTime"]),
-        end_time=_parse_aware_utc(a["EndTime"]),
-        publish_time=publish_time,
-        net_imbalance_volume=float(a["NetImbalanceVolume"]),
-        imbalance_settlement_price=float(a["ImbalanceSettlementPrice"]),
-    )
-
-
-def parse_physical_notifications_report(xml: str) -> list[PhysicalNotification]:
-    """Parse a `PUB_DailyFinalPhysicalNotifications_*.xml` payload into a list of rows.
-
-    Each file covers one trade day; rows represent individual physical notification
-    segments for each resource across one or more delivery dates.
-    """
-    try:
-        root = ET.fromstring(xml)
-    except ET.ParseError as exc:
-        raise ParseError(f"invalid XML: {exc}") from exc
-
-    publish_time = _parse_aware_utc(root.attrib["PublishTime"])
-
-    rows = root.findall("PUB_DailyFinalPhysicalNotifications")
-    if not rows:
-        raise ParseError("physical notifications report missing <PUB_DailyFinalPhysicalNotifications> elements")
-
-    return [
-        PhysicalNotification(
-            resource_name=a["ResourceName"],
-            start_time=_parse_aware_utc(a["StartTime"]),
-            start_mw=float(a["StartMW"]),
-            end_time=_parse_aware_utc(a["EndTime"]),
-            end_mw=float(a["EndMW"]),
-            under_test=_yn_to_bool(a["UnderTestFlag"]),
-            publish_time=publish_time,
-        )
-        for row in rows
-        for a in (row.attrib,)
-    ]
-
-
-def parse_daily_meter_data_report(xml: str) -> list[DailyMeterData]:
-    """Parse a `PUB_DailyMeterDataD1_*.xml` payload into a list of `DailyMeterData` rows.
-
-    Each file covers one trade day; rows represent 30-minute metering intervals per resource.
-    """
-    try:
-        root = ET.fromstring(xml)
-    except ET.ParseError as exc:
-        raise ParseError(f"invalid XML: {exc}") from exc
-
-    rows = root.findall("PUB_DailyMeterDataD1")
-    if not rows:
-        raise ParseError("meter data report missing <PUB_DailyMeterDataD1> elements")
-
-    return [
-        DailyMeterData(
-            resource_name=row.attrib["ResourceName"],
-            start_time=_parse_aware_utc(row.attrib["StartTime"]),
-            end_time=_parse_aware_utc(row.attrib["EndTime"]),
-            metered_mw=float(row.attrib["MeteredMW"]),
-        )
-        for row in rows
-    ]
 
 
 def parse_imbalance_price_supp_info_report(xml: str) -> list[ImbalancePriceSuppInfo]:
@@ -321,11 +282,56 @@ def parse_imbalance_price_supp_info_report(xml: str) -> list[ImbalancePriceSuppI
     return result
 
 
-def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance]:
-    """Parse a `PUB_HrlyForecastImbalance_*.xml` payload into a list of rows.
+def parse_imbalance_settlement_report(xml: str) -> ImbalanceSettlementReport:
+    """Parse a `PUB_30MinAvgImbalPrc_*.xml` payload into an `ImbalanceSettlementReport`.
 
-    Each file covers one trade day; rows represent individual half-hour forecast
-    imbalance periods.
+    Each file is one 30-minute settlement period with net imbalance volume and the
+    volume-weighted settlement price, inside a `<PUB_30MinAvgImbalPrc>` element.
+    """
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"invalid XML: {exc}") from exc
+
+    row = root.find("PUB_30MinAvgImbalPrc")
+    if row is None:
+        raise ParseError("settlement report missing <PUB_30MinAvgImbalPrc> element")
+
+    a = row.attrib
+    return ImbalanceSettlementReport(
+        start_time=_parse_aware_utc(a["StartTime"]),
+        net_imbalance_volume=float(a["NetImbalanceVolume"]),
+        imbalance_settlement_price=float(a["ImbalanceSettlementPrice"]),
+    )
+
+
+def parse_lts_report(xml: str):
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        raise ParseError(f"Invalid XML: {exc}") from exc
+
+    rows = root.findall("PUB_LTSDOperationalSchedule")
+    if not rows:
+        raise ParseError("LTS report has no <PUB_LTSDOperationalSchedule> elements")
+
+    return [
+        LTSReport(
+            publish_time=a["PublishTime"],
+            resource_name=a["ResourceName"],
+            start_time=a["StartTime"],
+            scheduled_quantity=a["ScheduledQuantity"],
+        )
+        for row in rows
+        for a in (row.attrib,)
+    ]
+
+
+def parse_physical_notifications_report(xml: str) -> list[PhysicalNotification]:
+    """Parse a `PUB_DailyFinalPhysicalNotifications_*.xml` payload into a list of rows.
+
+    Each file covers one trade day; rows represent individual physical notification
+    segments for each resource across one or more delivery dates.
     """
     try:
         root = ET.fromstring(xml)
@@ -334,19 +340,19 @@ def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance
 
     publish_time = _parse_aware_utc(root.attrib["PublishTime"])
 
-    rows = root.findall("PUB_HrlyForecastImbalance")
+    rows = root.findall("PUB_DailyFinalPhysicalNotifications")
     if not rows:
-        raise ParseError("forecast imbalance report missing <PUB_HrlyForecastImbalance> elements")
+        raise ParseError("physical notifications report missing <PUB_DailyFinalPhysicalNotifications> elements")
 
     return [
-        HrlyForecastImbalance(
-            publish_time=publish_time,
+        PhysicalNotification(
+            resource_name=a["ResourceName"],
             start_time=_parse_aware_utc(a["StartTime"]),
-            total_pn=float(a["TotalPN"]),
-            net_interconnector_schedule=float(a["NetInterconnectorSchedule"]),
-            tso_demand_forecast=float(a["TSODemandForecast"]),
-            tso_renewable_forecast=float(a["TSORenewableForecast"]),
-            calculated_imbalance=float(a["CalculatedImbalance"]),
+            start_mw=float(a["StartMW"]),
+            end_time=_parse_aware_utc(a["EndTime"]),
+            end_mw=float(a["EndMW"]),
+            under_test=_yn_to_bool(a["UnderTestFlag"]),
+            publish_time=publish_time,
         )
         for row in rows
         for a in (row.attrib,)
@@ -371,25 +377,3 @@ def parse_wind_forecast_report(xml: str):
     ]
 
     return Forecast(name="wind_forecast", source="semo", publish_time=publish_time, data=points)
-
-
-def parse_lts_report(xml: str):
-    try:
-        root = ET.fromstring(xml)
-    except ET.ParseError as exc:
-        raise ParseError(f"Invalid XML: {exc}") from exc
-
-    rows = root.findall("PUB_LTSDOperationalSchedule")
-    if not rows:
-        raise ParseError("LTS report has no <PUB_LTSDOperationalSchedule> elements")
-
-    return [
-        LTSReport(
-            publish_time=a["PublishTime"],
-            resource_name=a["ResourceName"],
-            start_time=a["StartTime"],
-            scheduled_quantity=a["ScheduledQuantity"],
-        )
-        for row in rows
-        for a in (row.attrib,)
-    ]

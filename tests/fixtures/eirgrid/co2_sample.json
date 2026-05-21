@@ -1,0 +1,34 @@
+{
+    "Rows": [
+        {
+            "EffectiveTime": "14-May-2026 00:00:00",
+            "FieldName": "CO2_EMISSIONS",
+            "Region": "ALL",
+            "Value": 657
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:15:00",
+            "FieldName": "CO2_EMISSIONS",
+            "Region": "ALL",
+            "Value": 693
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:30:00",
+            "FieldName": "CO2_EMISSIONS",
+            "Region": "ALL",
+            "Value": null
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:45:00",
+            "FieldName": "CO2_EMISSIONS",
+            "Region": "ROI",
+            "Value": 486
+        },
+        {
+            "EffectiveTime": "14-May-2026 01:00:00",
+            "FieldName": "CO2_EMISSIONS",
+            "Region": "ROI",
+            "Value": 520
+        }
+    ]
+}

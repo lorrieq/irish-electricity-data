@@ -1,0 +1,28 @@
+{
+    "Rows": [
+        {
+            "EffectiveTime": "14-May-2026 09:00:00",
+            "FieldName": "SYS_FREQUENCY",
+            "Region": "ALL",
+            "Value": 50.02
+        },
+        {
+            "EffectiveTime": "14-May-2026 09:00:05",
+            "FieldName": "SYS_FREQUENCY",
+            "Region": "ALL",
+            "Value": 50.0
+        },
+        {
+            "EffectiveTime": "14-May-2026 09:00:10",
+            "FieldName": "SYS_FREQUENCY",
+            "Region": "ALL",
+            "Value": null
+        },
+        {
+            "EffectiveTime": "14-May-2026 09:00:15",
+            "FieldName": "SYS_FREQUENCY",
+            "Region": "ALL",
+            "Value": 50.01
+        }
+    ]
+}

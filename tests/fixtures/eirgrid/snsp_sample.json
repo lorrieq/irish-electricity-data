@@ -1,0 +1,28 @@
+{
+    "Rows": [
+        {
+            "EffectiveTime": "14-May-2026 00:00:00",
+            "FieldName": "SNSP_ALL",
+            "Region": "ALL",
+            "Value": 65.9455
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:30:00",
+            "FieldName": "SNSP_ALL",
+            "Region": "ALL",
+            "Value": 62.3181
+        },
+        {
+            "EffectiveTime": "14-May-2026 01:00:00",
+            "FieldName": "SNSP_ALL",
+            "Region": "ALL",
+            "Value": null
+        },
+        {
+            "EffectiveTime": "14-May-2026 01:30:00",
+            "FieldName": "SNSP_ALL",
+            "Region": "ALL",
+            "Value": 59.2893
+        }
+    ]
+}

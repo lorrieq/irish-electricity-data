@@ -43,10 +43,7 @@ class ImbalancePriceReport(_FrozenModel):
 class ImbalanceSettlementReport(_FrozenModel):
     """Represents a 30-minute imbalance settlement period."""
 
-    trade_date: dt.date
     start_time: dt.datetime
-    end_time: dt.datetime
-    publish_time: dt.datetime
     net_imbalance_volume: float
     imbalance_settlement_price: float
 
@@ -92,7 +89,6 @@ class DailyMeterData(_FrozenModel):
 
     resource_name: str
     start_time: dt.datetime
-    end_time: dt.datetime
     metered_mw: float
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class Auction(StrEnum):
@@ -13,32 +13,13 @@ class Auction(StrEnum):
     IDA3 = "IDA3"
 
 
-class DataStatus(StrEnum):
-    ACTUAL = "ACTUAL"
-    ESTIMATED = "ESTIMATED"
-    MISSING = "MISSING"
-
-
 class _FrozenModel(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
 
 class DataPoint(_FrozenModel):
-    """A single timestamped observation. `value` is None when `status == MISSING`."""
-
     timestamp: dt.datetime
     value: float | None = None
-    status: DataStatus = DataStatus.ACTUAL
-
-
-class Series(_FrozenModel):
-    """A homogeneous timeseries for a single (area, name) pair."""
-
-    area: str
-    name: str
-    frequency: int = Field(description="Sampling period in minutes.")
-    unit: str | None = None
-    data: list[DataPoint]
 
 
 class ReportReference(_FrozenModel):

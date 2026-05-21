@@ -3,40 +3,99 @@ import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from irish_electricity_data.providers.eirgrid import parse_interconnector_flows, parse_outturn
-from irish_electricity_data.schema import Series
+from irish_electricity_data.providers.eirgrid import (
+    EirgridCo2Data,
+    EirgridInterconnectorData,
+    EirgridOutturnData,
+    parse_co2,
+    parse_frequency,
+    parse_interconnector_flows,
+    parse_outturn,
+    parse_snsp,
+)
 
 UTC = ZoneInfo("UTC")
 
 
-def test_parse_outturn_groups_by_region_and_variable():
+def test_parse_outturn_returns_structured_data():
     fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "outturn_sample.json"
     payload = json.loads(fixture_path.read_text())
 
     result = parse_outturn(payload)
 
-    assert all(isinstance(s, Series) for s in result)
-    keys = {(s.area, s.name) for s in result}
-    assert keys == {("NI", "Solar"), ("NI", "Wind"), ("NI", "Demand")}
-
-    for s in result:
-        assert s.frequency == 15
-        assert s.unit == "MW"
-        assert all(p.value is not None for p in s.data)
+    assert isinstance(result, EirgridOutturnData)
 
     # Each variable has 4 rows in the fixture, 2 of which are null and get dropped.
-    solar = next(s for s in result if s.name == "Solar")
-    assert len(solar.data) == 2
+    assert len(result.solar_ni) == 2
     # 09:00 IST in April is BST (UTC+1) → 08:00 UTC
-    assert solar.data[0].timestamp == dt.datetime(2026, 4, 24, 8, 0, tzinfo=UTC)
-    assert solar.data[0].value == 57
-    assert solar.data[-1].timestamp == dt.datetime(2026, 4, 24, 8, 15, tzinfo=UTC)
-    assert solar.data[-1].value == 65
+    assert result.solar_ni[0].timestamp == dt.datetime(2026, 4, 24, 8, 0, tzinfo=UTC)
+    assert result.solar_ni[0].value == 57
+    assert result.solar_ni[1].timestamp == dt.datetime(2026, 4, 24, 8, 15, tzinfo=UTC)
+    assert result.solar_ni[1].value == 65
 
-    demand = next(s for s in result if s.name == "Demand")
-    assert len(demand.data) == 2
-    assert demand.data[0].timestamp == dt.datetime(2026, 4, 24, 4, 30, tzinfo=UTC)
-    assert demand.data[0].value == 639
+    assert len(result.wind_ni) == 2
+    assert result.wind_ni[0].value == 47
+
+    assert len(result.demand_ni) == 2
+    assert result.demand_ni[0].timestamp == dt.datetime(2026, 4, 24, 4, 30, tzinfo=UTC)
+    assert result.demand_ni[0].value == 639
+
+    # No all-island or ROI data in the fixture.
+    assert result.solar_ie == []
+    assert result.solar_roi == []
+    assert result.wind_ie == []
+    assert result.demand_ie == []
+
+
+def test_parse_frequency():
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "frequency_sample.json"
+    payload = json.loads(fixture_path.read_text())
+
+    result = parse_frequency(payload)
+
+    # 4 rows in the fixture, 1 null dropped.
+    assert len(result) == 3
+    # 14-May-2026 09:00:00 Dublin IST (UTC+1) → 08:00:00 UTC
+    assert result[0].timestamp == dt.datetime(2026, 5, 14, 8, 0, 0, tzinfo=UTC)
+    assert result[0].value == 50.02
+    assert result[1].value == 50.0
+    assert result[2].value == 50.01
+
+
+def test_parse_co2():
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "co2_sample.json"
+    payload = json.loads(fixture_path.read_text())
+
+    result = parse_co2(payload)
+
+    assert isinstance(result, EirgridCo2Data)
+
+    # 3 ALL rows in the fixture, 1 null dropped → 2 points.
+    assert len(result.co2_ie) == 2
+    # 14-May-2026 00:00:00 Dublin IST (UTC+1) → 2026-05-13 23:00:00 UTC
+    assert result.co2_ie[0].timestamp == dt.datetime(2026, 5, 13, 23, 0, 0, tzinfo=UTC)
+    assert result.co2_ie[0].value == 657
+    assert result.co2_ie[1].value == 693
+
+    assert len(result.co2_roi) == 2
+    assert result.co2_roi[0].value == 486
+
+    assert result.co2_ni == []
+
+
+def test_parse_snsp():
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "snsp_sample.json"
+    payload = json.loads(fixture_path.read_text())
+
+    result = parse_snsp(payload)
+
+    # 4 rows in the fixture, 1 null dropped.
+    assert len(result) == 3
+    # 14-May-2026 00:00:00 Dublin IST (UTC+1) → 2026-05-13 23:00:00 UTC
+    assert result[0].timestamp == dt.datetime(2026, 5, 13, 23, 0, 0, tzinfo=UTC)
+    assert result[0].value == 65.9455
+    assert result[1].value == 62.3181
+    assert result[2].value == 59.2893
 
 
 def test_parse_interconnector_flows():
@@ -45,30 +104,15 @@ def test_parse_interconnector_flows():
 
     result = parse_interconnector_flows(payload)
 
-    assert all(isinstance(s, Series) for s in result)
-    assert all(s.frequency == 15 for s in result)
-    assert all(s.unit == "MW" for s in result)
-
-    by_name = {s.name: s for s in result}
-    assert set(by_name) == {"EWIC", "GREENLINK", "MOYLE", "Net"}
+    assert isinstance(result, EirgridInterconnectorData)
 
     # 25-Apr-2026 00:00:00 Dublin IST (UTC+1) → 2026-04-24 23:00:00 UTC
     expected_ts = dt.datetime(2026, 4, 24, 23, 0, tzinfo=UTC)
 
-    ewic = by_name["EWIC"]
-    assert ewic.area == "ROI"
-    assert len(ewic.data) == 1
-    assert ewic.data[0].timestamp == expected_ts
-    assert ewic.data[0].value == 3
+    assert len(result.ewic) == 1
+    assert result.ewic[0].timestamp == expected_ts
+    assert result.ewic[0].value == 3
 
-    greenlink = by_name["GREENLINK"]
-    assert greenlink.area == "ROI"
-    assert greenlink.data[0].value == 520
-
-    moyle = by_name["MOYLE"]
-    assert moyle.area == "NI"
-    assert moyle.data[0].value == 363
-
-    net = by_name["Net"]
-    assert net.area == "ALL"
-    assert net.data[0].value == 886
+    assert result.greenlink[0].value == 520
+    assert result.moyle[0].value == 363
+    assert result.net[0].value == 886

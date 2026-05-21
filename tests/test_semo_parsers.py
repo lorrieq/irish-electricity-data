@@ -24,9 +24,6 @@ from irish_electricity_data.providers.semo import (
     parse_series_chunk,
     parse_wind_forecast_report,
 )
-from irish_electricity_data.schema import Series
-
-
 def test_parse_series_chunk():
     data = [
         ["Index prices", 30, "EUR"],
@@ -34,16 +31,11 @@ def test_parse_series_chunk():
         [180, 156.61],
     ]
 
-    result = parse_series_chunk("NI", data)
+    result = parse_series_chunk(data)
 
-    assert isinstance(result, Series)
-    assert result.area == "NI"
-    assert result.name == "Index prices"
-    assert result.frequency == 30
-    assert result.unit == "EUR"
-    assert len(result.data) == 2
-    assert result.data[0].timestamp == dt.datetime(2026, 4, 7, 22, 0, tzinfo=dt.UTC)
-    assert result.data[1].value == 156.61
+    assert len(result) == 2
+    assert result[0].timestamp == dt.datetime(2026, 4, 7, 22, 0, tzinfo=dt.UTC)
+    assert result[1].value == 156.61
 
 
 def test_parse_auction_report():
@@ -89,10 +81,7 @@ def test_parse_imbalance_settlement_report():
     result = parse_imbalance_settlement_report(fixture_path.read_text())
 
     assert isinstance(result, ImbalanceSettlementReport)
-    assert result.trade_date == dt.date(2026, 4, 23)
     assert result.start_time == dt.datetime(2026, 4, 23, 15, 0, tzinfo=ZoneInfo("UTC"))
-    assert result.end_time == dt.datetime(2026, 4, 23, 15, 30, tzinfo=ZoneInfo("UTC"))
-    assert result.publish_time == dt.datetime(2026, 4, 23, 16, 0, 3, tzinfo=ZoneInfo("UTC"))
     assert result.net_imbalance_volume == -50.273
     assert result.imbalance_settlement_price == -22.6
 
@@ -129,7 +118,6 @@ def test_parse_daily_meter_data_report():
     first = result[0]
     assert first.resource_name == "I_ROIEWIC"
     assert first.start_time == dt.datetime(2025, 5, 21, 23, 0, tzinfo=dt.UTC)
-    assert first.end_time == dt.datetime(2025, 5, 21, 23, 29, 59, tzinfo=dt.UTC)
     assert first.metered_mw == -1.32
 
     last = result[-1]

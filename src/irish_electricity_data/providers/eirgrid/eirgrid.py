@@ -3,10 +3,18 @@ from __future__ import annotations
 import datetime as dt
 from enum import StrEnum
 
+from ...core.constants import TZ_DUBLIN
 from ...core.exceptions import ProviderError
-from ...schema.models import Series
+from ...schema.models import DataPoint
 from ..base import BaseProvider
-from .parsers import parse_interconnector_flows, parse_outturn
+from .models import EirgridCo2Data, EirgridInterconnectorData, EirgridOutturnData
+from .parsers import parse_co2, parse_frequency, parse_interconnector_flows, parse_outturn, parse_snsp
+
+
+def _to_ist(ts: dt.datetime) -> dt.datetime:
+    if ts.tzinfo is None:
+        return ts.replace(tzinfo=TZ_DUBLIN)
+    return ts.astimezone(TZ_DUBLIN)
 
 
 class Variable(StrEnum):
@@ -39,23 +47,131 @@ class EirGridProvider(BaseProvider):
     name = "eirgrid"
     base_url = "https://www.smartgriddashboard.com"
 
+    def get_co2(
+        self,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
+        *,
+        region: Region | None = None,
+    ) -> EirgridCo2Data:
+        """Fetch 15-minute CO2 emission readings.
+
+        When `region` is omitted, all three regions are fetched (one request each)
+        and merged. Fields not covered by the request are empty lists.
+        Naive datetimes are assumed to be Dublin local time.
+        """
+        start_date = _to_ist(start).date()
+        end_date = _to_ist(end).date() if end is not None else start_date
+        if end_date < start_date:
+            raise ValueError("end must be on or after start")
+
+        if region is None:
+            merged = {}
+            for r in Region:
+                result = self.get_co2(start, end, region=r)
+                for field in EirgridCo2Data.model_fields:
+                    points = getattr(result, field)
+                    if points:
+                        merged[field] = points
+            return EirgridCo2Data(**merged)
+
+        params = {
+            "region": region.value,
+            "chartType": "co2",
+            "dateRange": "day",
+            "dateFrom": start_date.strftime("%d-%b-%Y"),
+            "dateTo": end_date.strftime("%d-%b-%Y"),
+            "areas": "co2emission",
+        }
+        payload = self._get_json("/api/chart/", params=params)
+        if not isinstance(payload, dict):
+            raise ProviderError("EirGrid CO2 response was not a JSON object")
+        return parse_co2(payload)
+
+    def get_frequency(
+        self,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
+    ) -> list[DataPoint]:
+        """Fetch 5-second grid frequency readings for the given time range.
+
+        Naive datetimes are assumed to be Dublin local time.
+        """
+        start_ist = _to_ist(start)
+        end_ist = _to_ist(end) if end is not None else start_ist
+        if end_ist < start_ist:
+            raise ValueError("end must be on or after start")
+
+        params = {
+            "region": "ALL",
+            "chartType": "frequency",
+            "dateRange": "hour",
+            "dateFrom": start_ist.strftime("%d-%b-%Y %H:%M"),
+            "dateTo": end_ist.strftime("%d-%b-%Y %H:%M"),
+            "areas": "frequency",
+        }
+        payload = self._get_json("/api/chart/", params=params)
+        if not isinstance(payload, dict):
+            raise ProviderError("EirGrid frequency response was not a JSON object")
+        return parse_frequency(payload)
+
+    def get_interconnector_flows(
+        self,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
+    ) -> EirgridInterconnectorData:
+        """Fetch 15-minute interconnector flows for the given delivery-date range.
+
+        Positive values indicate import into Ireland; negative values export.
+        Naive datetimes are assumed to be Dublin local time.
+        """
+        start_date = _to_ist(start).date()
+        end_date = _to_ist(end).date() if end is not None else start_date
+        if end_date < start_date:
+            raise ValueError("end must be on or after start")
+
+        params = {
+            "region": "ALL",
+            "chartType": "interconnection",
+            "dateRange": "day",
+            "dateFrom": start_date.strftime("%d-%b-%Y"),
+            "dateTo": end_date.strftime("%d-%b-%Y"),
+            "areas": "interconnection",
+        }
+        payload = self._get_json("/api/chart/", params=params)
+        if not isinstance(payload, dict):
+            raise ProviderError("EirGrid interconnection response was not a JSON object")
+        return parse_interconnector_flows(payload)
+
     def get_outturn(
         self,
-        start_date: dt.date,
-        end_date: dt.date | None = None,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
         *,
         variables: Variable | list[Variable] | None = None,
-        region: Region = Region.ALL,
-    ) -> list[Series]:
+        region: Region | None = None,
+    ) -> EirgridOutturnData:
         """Fetch 15-minute outturn for the given variables and delivery-date range.
 
-        When `variables` is omitted, all available variables are fetched. Returns
-        one `Series` per (Region, variable) in the response.
+        When `region` is omitted, all three regions are fetched (one request each)
+        and merged. When `variables` is omitted, all available variables are fetched.
+        Fields not covered by the request are empty lists.
+        Naive datetimes are assumed to be Dublin local time.
         """
-        if end_date is None:
-            end_date = start_date
+        start_date = _to_ist(start).date()
+        end_date = _to_ist(end).date() if end is not None else start_date
         if end_date < start_date:
-            raise ValueError("end_date must be on or after start_date")
+            raise ValueError("end must be on or after start")
+
+        if region is None:
+            merged = {}
+            for r in Region:
+                result = self.get_outturn(start, end, variables=variables, region=r)
+                for field in EirgridOutturnData.model_fields:
+                    points = getattr(result, field)
+                    if points:
+                        merged[field] = points
+            return EirgridOutturnData(**merged)
 
         if variables is None:
             variables = list(Variable)
@@ -77,55 +193,55 @@ class EirGridProvider(BaseProvider):
 
     def get_outturn_demand(
         self,
-        start_date: dt.date,
-        end_date: dt.date | None = None,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
         *,
-        region: Region = Region.ALL,
-    ) -> Series:
-        return self.get_outturn(start_date, end_date, variables=Variable.DEMAND, region=region)
+        region: Region | None = None,
+    ) -> EirgridOutturnData:
+        return self.get_outturn(start, end, variables=Variable.DEMAND, region=region)
 
     def get_outturn_solar(
         self,
-        start_date: dt.date,
-        end_date: dt.date | None = None,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
         *,
-        region: Region = Region.ALL,
-    ) -> Series:
-        return self.get_outturn(start_date, end_date, variables=Variable.SOLAR, region=region)
+        region: Region | None = None,
+    ) -> EirgridOutturnData:
+        return self.get_outturn(start, end, variables=Variable.SOLAR, region=region)
 
     def get_outturn_wind(
         self,
-        start_date: dt.date,
-        end_date: dt.date | None = None,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
         *,
-        region: Region = Region.ALL,
-    ) -> Series:
-        return self.get_outturn(start_date, end_date, variables=Variable.WIND, region=region)
+        region: Region | None = None,
+    ) -> EirgridOutturnData:
+        return self.get_outturn(start, end, variables=Variable.WIND, region=region)
 
-    def get_interconnector_flows(
+    def get_snsp(
         self,
-        start_date: dt.date,
-        end_date: dt.date | None = None,
-    ) -> list[Series]:
-        """Fetch 15-minute interconnector flows for the given delivery-date range.
+        start: dt.datetime,
+        end: dt.datetime | None = None,
+    ) -> list[DataPoint]:
+        """Fetch 30-minute SNSP (System Non-Synchronous Penetration) readings.
 
-        Returns one `Series` per (Region, interconnector/net) in the response.
-        Positive values indicate import into Ireland; negative values export.
+        Values are percentages. Only all-island data is available from this endpoint.
+        Naive datetimes are assumed to be Dublin local time.
         """
-        if end_date is None:
-            end_date = start_date
+        start_date = _to_ist(start).date()
+        end_date = _to_ist(end).date() if end is not None else start_date
         if end_date < start_date:
-            raise ValueError("end_date must be on or after start_date")
+            raise ValueError("end must be on or after start")
 
         params = {
             "region": "ALL",
-            "chartType": "interconnection",
+            "chartType": "snsp",
             "dateRange": "day",
             "dateFrom": start_date.strftime("%d-%b-%Y"),
             "dateTo": end_date.strftime("%d-%b-%Y"),
-            "areas": "interconnection",
+            "areas": "SnspAll",
         }
         payload = self._get_json("/api/chart/", params=params)
         if not isinstance(payload, dict):
-            raise ProviderError("EirGrid interconnection response was not a JSON object")
-        return parse_interconnector_flows(payload)
+            raise ProviderError("EirGrid SNSP response was not a JSON object")
+        return parse_snsp(payload)
