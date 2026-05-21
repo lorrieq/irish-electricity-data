@@ -6,7 +6,7 @@ from typing import Any
 
 from ...core.constants import TZ_DUBLIN, TZ_UTC
 from ...schema.models import DataPoint
-from .models import EirgridCo2Data, EirgridInterconnectorData, EirgridOutturnData
+from .models import EirgridCo2Data, EirgridFuelMix, EirgridInterconnectorData, EirgridOutturnData
 
 _OUTTURN_FIELD_NAME_TO_LABEL: dict[str, str] = {
     "SOLAR_ACTUAL": "Solar",
@@ -24,6 +24,14 @@ _OUTTURN_KEY_TO_FIELD: dict[tuple[str, str], str] = {
     ("ALL", "Solar"):  "solar_ie",
     ("NI",  "Solar"):  "solar_ni",
     ("ROI", "Solar"):  "solar_roi",
+}
+
+_FUEL_FIELD_TO_FIELD: dict[str, str] = {
+    "FUEL_COAL": "coal",
+    "FUEL_GAS": "gas",
+    "FUEL_NET_IMPORT": "net_import",
+    "FUEL_OTHER_FOSSIL": "other_fossil",
+    "FUEL_RENEW": "renewable",
 }
 
 _INTER_FIELD_TO_FIELD: dict[str, str] = {
@@ -136,3 +144,30 @@ def parse_outturn(payload: dict[str, Any]) -> EirgridOutturnData:
 def parse_snsp(payload: dict[str, Any]) -> list[DataPoint]:
     """Parse an SNSP response."""
     return _parse_datapoints_by_region(payload, "SNSP_ALL").get("ALL", [])
+
+
+def parse_generation(payload: dict[str, Any]) -> list[DataPoint]:
+    """Parse a generation actual response."""
+    return _parse_datapoints_by_region(payload, "GEN_EXP").get("ALL", [])
+
+
+def parse_fuel_mix(payload: dict[str, Any]) -> EirgridFuelMix:
+    """Parse an average-fuel-mix response into an EirgridFuelMix.
+    Rows with an unknown FieldName or null Value are dropped.
+    """
+    rows = payload.get("Rows", [])
+    by_field: dict[str, list[DataPoint]] = defaultdict(list)
+
+    for row in rows:
+        field = _FUEL_FIELD_TO_FIELD.get(row.get("FieldName"))
+        if field is None:
+            continue
+        value = row.get("Value")
+        if value is None:
+            continue
+        by_field[field].append(DataPoint(timestamp=_parse_effective_time(row["EffectiveTime"]), value=value))
+
+    for points in by_field.values():
+        points.sort(key=lambda p: p.timestamp)
+
+    return EirgridFuelMix(**by_field)

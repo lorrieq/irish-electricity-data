@@ -1,0 +1,28 @@
+{
+    "Rows": [
+        {
+            "EffectiveTime": "21-May-2026 00:00:00",
+            "FieldName": "GEN_EXP",
+            "Region": "ALL",
+            "Value": 3529
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:15:00",
+            "FieldName": "GEN_EXP",
+            "Region": "ALL",
+            "Value": 3612
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:30:00",
+            "FieldName": "GEN_EXP",
+            "Region": "ALL",
+            "Value": null
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:45:00",
+            "FieldName": "GEN_EXP",
+            "Region": "ALL",
+            "Value": 3748
+        }
+    ]
+}

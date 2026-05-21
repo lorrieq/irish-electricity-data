@@ -3,12 +3,12 @@ from __future__ import annotations
 import datetime as dt
 from enum import StrEnum
 
-from ...core.constants import TZ_DUBLIN
+from ...core.constants import TZ_DUBLIN, TZ_UTC
 from ...core.exceptions import ProviderError
 from ...schema.models import DataPoint
 from ..base import BaseProvider
-from .models import EirgridCo2Data, EirgridInterconnectorData, EirgridOutturnData
-from .parsers import parse_co2, parse_frequency, parse_interconnector_flows, parse_outturn, parse_snsp
+from .models import EirgridCo2Data, EirgridFuelMix, EirgridInterconnectorData, EirgridOutturnData
+from .parsers import parse_co2, parse_frequency, parse_fuel_mix, parse_generation, parse_interconnector_flows, parse_outturn, parse_snsp
 
 
 def _to_ist(ts: dt.datetime) -> dt.datetime:
@@ -87,6 +87,29 @@ class EirGridProvider(BaseProvider):
         if not isinstance(payload, dict):
             raise ProviderError("EirGrid CO2 response was not a JSON object")
         return parse_co2(payload)
+    
+    def _fetch_frequency(self, range_id: str, start: dt.datetime, end: dt.datetime) -> list[DataPoint]:
+        if range_id == "hour":
+            start_str = start.strftime("%d-%b-%Y %H:%M")
+            end_str = end.strftime("%d-%b-%Y %H:%M")
+        elif range_id == "day":
+            start_str = start.strftime("%d-%b-%Y")
+            end_str = end.strftime("%d-%b-%Y")
+        else:
+            raise ValueError("invalid range_id")
+
+        params = {
+            "region": "ALL",
+            "chartType": "frequency",
+            "dateRange": range_id,
+            "dateFrom": start_str,
+            "dateTo": end_str,
+            "areas": "frequency",
+        }
+        payload = self._get_json("/api/chart/", params=params)
+        if not isinstance(payload, dict):
+            raise ProviderError("EirGrid frequency response was not a JSON object")
+        return parse_frequency(payload)
 
     def get_frequency(
         self,
@@ -102,18 +125,19 @@ class EirGridProvider(BaseProvider):
         if end_ist < start_ist:
             raise ValueError("end must be on or after start")
 
-        params = {
-            "region": "ALL",
-            "chartType": "frequency",
-            "dateRange": "hour",
-            "dateFrom": start_ist.strftime("%d-%b-%Y %H:%M"),
-            "dateTo": end_ist.strftime("%d-%b-%Y %H:%M"),
-            "areas": "frequency",
-        }
-        payload = self._get_json("/api/chart/", params=params)
-        if not isinstance(payload, dict):
-            raise ProviderError("EirGrid frequency response was not a JSON object")
-        return parse_frequency(payload)
+        if start_ist.date() == end_ist.date() and start_ist.hour == end_ist.hour:
+            points = self._fetch_frequency("hour", start_ist, end_ist)
+        else:
+            points = []
+            current = start_ist.date()
+            end_date = end_ist.date()
+            while current <= end_date:
+                points.extend(self._fetch_frequency("day", current, current))
+                current += dt.timedelta(days=1)
+
+        start_utc = start_ist.astimezone(TZ_UTC)
+        end_utc = end_ist.astimezone(TZ_UTC)
+        return [p for p in points if start_utc <= p.timestamp <= end_utc]
 
     def get_interconnector_flows(
         self,
@@ -218,6 +242,50 @@ class EirGridProvider(BaseProvider):
     ) -> EirgridOutturnData:
         return self.get_outturn(start, end, variables=Variable.WIND, region=region)
 
+    def get_generation(
+        self,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
+    ) -> list[DataPoint]:
+        """Fetch 15-minute total generation actuals.
+
+        Only all-island data is available from this endpoint.
+        Naive datetimes are assumed to be Dublin local time.
+        """
+        start_date = _to_ist(start).date()
+        end_date = _to_ist(end).date() if end is not None else start_date
+        if end_date < start_date:
+            raise ValueError("end must be on or after start")
+
+        params = {
+            "region": "ALL",
+            "chartType": "generation",
+            "dateRange": "day",
+            "dateFrom": start_date.strftime("%d-%b-%Y"),
+            "dateTo": end_date.strftime("%d-%b-%Y"),
+            "areas": "generationactual",
+        }
+        payload = self._get_json("/api/chart/", params=params)
+        if not isinstance(payload, dict):
+            raise ProviderError("EirGrid generation response was not a JSON object")
+        return parse_generation(payload)
+
+    def get_fuel_mix(self) -> EirgridFuelMix:
+        """Fetch the average fuel mix breakdown for today.
+
+        Returns energy (MWh) per fuel type averaged over the current day.
+        Only all-island data is available from this endpoint.
+        """
+        params = {
+            "area": "fuelmix",
+            "region": "ALL",
+            "dateRange": "day",
+        }
+        payload = self._get_json("/api/average-fuel-mix/", params=params)
+        if not isinstance(payload, dict):
+            raise ProviderError("EirGrid fuel mix response was not a JSON object")
+        return parse_fuel_mix(payload)
+
     def get_snsp(
         self,
         start: dt.datetime,
@@ -228,20 +296,30 @@ class EirGridProvider(BaseProvider):
         Values are percentages. Only all-island data is available from this endpoint.
         Naive datetimes are assumed to be Dublin local time.
         """
-        start_date = _to_ist(start).date()
-        end_date = _to_ist(end).date() if end is not None else start_date
-        if end_date < start_date:
+        start_ist = _to_ist(start)
+        end_ist = _to_ist(end) if end is not None else start_ist
+        if end_ist < start_ist:
             raise ValueError("end must be on or after start")
 
-        params = {
-            "region": "ALL",
-            "chartType": "snsp",
-            "dateRange": "day",
-            "dateFrom": start_date.strftime("%d-%b-%Y"),
-            "dateTo": end_date.strftime("%d-%b-%Y"),
-            "areas": "SnspAll",
-        }
-        payload = self._get_json("/api/chart/", params=params)
-        if not isinstance(payload, dict):
-            raise ProviderError("EirGrid SNSP response was not a JSON object")
-        return parse_snsp(payload)
+        points: list[DataPoint] = []
+        current = start_ist.date()
+        end_date = end_ist.date()
+        while current <= end_date:
+            date_str = current.strftime("%d-%b-%Y")
+            params = {
+                "region": "ALL",
+                "chartType": "snsp",
+                "dateRange": "day",
+                "dateFrom": date_str,
+                "dateTo": date_str,
+                "areas": "SnspAll",
+            }
+            payload = self._get_json("/api/chart/", params=params)
+            if not isinstance(payload, dict):
+                raise ProviderError("EirGrid SNSP response was not a JSON object")
+            points.extend(parse_snsp(payload))
+            current += dt.timedelta(days=1)
+
+        start_utc = start_ist.astimezone(TZ_UTC)
+        end_utc = end_ist.astimezone(TZ_UTC)
+        return [p for p in points if start_utc <= p.timestamp <= end_utc]

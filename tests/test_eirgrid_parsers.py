@@ -5,10 +5,13 @@ from zoneinfo import ZoneInfo
 
 from irish_electricity_data.providers.eirgrid import (
     EirgridCo2Data,
+    EirgridFuelMix,
     EirgridInterconnectorData,
     EirgridOutturnData,
     parse_co2,
     parse_frequency,
+    parse_fuel_mix,
+    parse_generation,
     parse_interconnector_flows,
     parse_outturn,
     parse_snsp,
@@ -108,6 +111,49 @@ def test_parse_snsp():
     assert result[0].value == 65.9455
     assert result[1].value == 62.3181
     assert result[2].value == 59.2893
+
+
+def test_parse_generation():
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "generation_sample.json"
+    payload = json.loads(fixture_path.read_text())
+
+    result = parse_generation(payload)
+
+    # 4 rows in the fixture, 1 null dropped.
+    assert len(result) == 3
+    # 21-May-2026 00:00:00 Dublin IST (UTC+1) → 2026-05-20 23:00:00 UTC
+    assert result[0].timestamp == dt.datetime(2026, 5, 20, 23, 0, 0, tzinfo=UTC)
+    assert result[0].value == 3529
+    assert result[1].value == 3612
+    assert result[2].value == 3748
+
+
+def test_parse_fuel_mix():
+    fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "fuel_mix_sample.json"
+    payload = json.loads(fixture_path.read_text())
+
+    result = parse_fuel_mix(payload)
+
+    assert isinstance(result, EirgridFuelMix)
+
+    # FUEL_NET_IMPORT is null in the fixture and gets dropped.
+    assert result.net_import == []
+
+    # 21-May-2026 00:00:00 Dublin IST (UTC+1) → 2026-05-20 23:00:00 UTC
+    expected_ts = dt.datetime(2026, 5, 20, 23, 0, 0, tzinfo=UTC)
+
+    assert len(result.coal) == 1
+    assert result.coal[0].timestamp == expected_ts
+    assert result.coal[0].value == 0
+
+    assert len(result.gas) == 1
+    assert result.gas[0].value == 40906.73
+
+    assert len(result.other_fossil) == 1
+    assert result.other_fossil[0].value == 1234.5
+
+    assert len(result.renewable) == 1
+    assert result.renewable[0].value == 56158.36
 
 
 def test_parse_interconnector_flows():

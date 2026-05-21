@@ -1,0 +1,37 @@
+{
+    "ErrorMessage": null,
+    "LastUpdated": "21-May-2026 18:00:00",
+    "Rows": [
+        {
+            "EffectiveTime": "21-May-2026 00:00:00",
+            "FieldName": "FUEL_COAL",
+            "Region": "ALL",
+            "Value": 0
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:00:00",
+            "FieldName": "FUEL_GAS",
+            "Region": "ALL",
+            "Value": 40906.73
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:00:00",
+            "FieldName": "FUEL_NET_IMPORT",
+            "Region": "ALL",
+            "Value": null
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:00:00",
+            "FieldName": "FUEL_OTHER_FOSSIL",
+            "Region": "ALL",
+            "Value": 1234.5
+        },
+        {
+            "EffectiveTime": "21-May-2026 00:00:00",
+            "FieldName": "FUEL_RENEW",
+            "Region": "ALL",
+            "Value": 56158.36
+        }
+    ],
+    "Status": "Success"
+}

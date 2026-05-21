@@ -31,6 +31,19 @@ class EirgridCo2Data(_FrozenModel):
     co2_intensity_roi: list[DataPoint] = []
 
 
+class EirgridFuelMix(_FrozenModel):
+    """Fuel mix breakdown. Values in MWh per fuel type.
+
+    Fields are empty lists when not present in the response.
+    """
+
+    coal: list[DataPoint] = []
+    gas: list[DataPoint] = []
+    net_import: list[DataPoint] = []
+    other_fossil: list[DataPoint] = []
+    renewable: list[DataPoint] = []
+
+
 class EirgridOutturnData(_FrozenModel):
     """15-minute outturn actuals for wind, demand, and solar across IE/NI/ROI.
 
