@@ -81,7 +81,7 @@ class EirGridProvider(BaseProvider):
             "dateRange": "day",
             "dateFrom": start_date.strftime("%d-%b-%Y"),
             "dateTo": end_date.strftime("%d-%b-%Y"),
-            "areas": "co2emission",
+            "areas": "co2emission,co2intensity",
         }
         payload = self._get_json("/api/chart/", params=params)
         if not isinstance(payload, dict):

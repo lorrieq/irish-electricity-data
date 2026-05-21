@@ -66,11 +66,15 @@ def _parse_datapoints_by_region(payload: dict[str, Any], field_name: str) -> dic
 
 def parse_co2(payload: dict[str, Any]) -> EirgridCo2Data:
     """Parse a CO2 response into an EirgridCo2Data."""
-    by_region = _parse_datapoints_by_region(payload, "CO2_EMISSIONS")
+    emissions = _parse_datapoints_by_region(payload, "CO2_EMISSIONS")
+    intensity = _parse_datapoints_by_region(payload, "CO2_INTENSITY")
     return EirgridCo2Data(
-        co2_ie=by_region.get("ALL", []),
-        co2_ni=by_region.get("NI", []),
-        co2_roi=by_region.get("ROI", []),
+        co2_ie=emissions.get("ALL", []),
+        co2_ni=emissions.get("NI", []),
+        co2_roi=emissions.get("ROI", []),
+        co2_intensity_ie=intensity.get("ALL", []),
+        co2_intensity_ni=intensity.get("NI", []),
+        co2_intensity_roi=intensity.get("ROI", []),
     )
 
 

@@ -82,6 +82,18 @@ def test_parse_co2():
 
     assert result.co2_ni == []
 
+    # 3 ALL intensity rows in the fixture, 1 null dropped → 2 points.
+    assert len(result.co2_intensity_ie) == 2
+    assert result.co2_intensity_ie[0].timestamp == dt.datetime(2026, 5, 13, 23, 0, 0, tzinfo=UTC)
+    assert result.co2_intensity_ie[0].value == 188
+    assert result.co2_intensity_ie[1].value == 184
+
+    assert len(result.co2_intensity_ni) == 1
+    assert result.co2_intensity_ni[0].value == 248
+
+    assert len(result.co2_intensity_roi) == 1
+    assert result.co2_intensity_roi[0].value == 179
+
 
 def test_parse_snsp():
     fixture_path = Path(__file__).parent / "fixtures" / "eirgrid" / "snsp_sample.json"

@@ -29,6 +29,36 @@
             "FieldName": "CO2_EMISSIONS",
             "Region": "ROI",
             "Value": 520
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:00:00",
+            "FieldName": "CO2_INTENSITY",
+            "Region": "ALL",
+            "Value": 188
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:15:00",
+            "FieldName": "CO2_INTENSITY",
+            "Region": "ALL",
+            "Value": null
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:30:00",
+            "FieldName": "CO2_INTENSITY",
+            "Region": "ALL",
+            "Value": 184
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:00:00",
+            "FieldName": "CO2_INTENSITY",
+            "Region": "NI",
+            "Value": 248
+        },
+        {
+            "EffectiveTime": "14-May-2026 00:00:00",
+            "FieldName": "CO2_INTENSITY",
+            "Region": "ROI",
+            "Value": 179
         }
     ]
 }
