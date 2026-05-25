@@ -5,17 +5,19 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from ...core.constants import TZ_UTC
+from ...core.constants import TZ_DUBLIN, TZ_UTC
 from ...core.exceptions import ProviderError
 from ...schema.models import Auction, ReportReference
 from ..base import BaseProvider
 from .models import (
     AuctionResult,
     DailyMeterData,
+    Forecast,
     HrlyForecastImbalance,
     ImbalancePriceReport,
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
+    LTSReport,
     PhysicalNotification,
 )
 from .parsers import (
@@ -63,6 +65,11 @@ def _datetime_from_resource_name(resource_name: str) -> dt.datetime | None:
         return dt.datetime.strptime(timestamp_str, "%Y%m%d%H%M").replace(tzinfo=TZ_UTC)
     except ValueError:
         return None
+
+
+def _ensure_tz_aware(d: dt.datetime) -> dt.datetime:
+    """Return d unchanged if tz-aware, otherwise assume Europe/Dublin."""
+    return d if d.tzinfo is not None else d.replace(tzinfo=TZ_DUBLIN)
 
 
 class SemoProvider(BaseProvider):
@@ -125,6 +132,7 @@ class SemoProvider(BaseProvider):
         If save_to is given, each file is written there using its resource name as the filename.
         Returns (ref, raw_content) pairs sorted by report time.
         """
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
         if end is None:
             end = start
         if end < start:
@@ -167,14 +175,16 @@ class SemoProvider(BaseProvider):
         end: dt.datetime | None = None,
     ) -> list[ImbalancePriceReport]:
         """Get every 5-minute imbalance price within the datetime range, sorted."""
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
         if end is None:
             end = start
         if end < start:
             raise ValueError("end must be on or after start")
 
+        # use PUB_5MinImbalPrc_ instead of PUB_5MinImbalPrc to avoid PUB_5MinImbalPrcSuppInfo reports
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_5MinImbalPrc"),
+                ("name", "PUB_5MinImbalPrc_"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start.date().strftime("%Y-%m-%d")),
@@ -193,12 +203,12 @@ class SemoProvider(BaseProvider):
         auction: Auction,
         start_date: dt.date,
         end_date: dt.date | None = None,
-    ) -> list[AuctionResult]:
+    ) -> AuctionResult:
         """Get auction results by delivery date, inclusive on both ends.
 
         Pads `date_to` by +1 day at the API layer to cover the 10:00-UTC filter
         quirk, then client-side filters and de-duplicates to the latest
-        `publish_time` per delivery date.
+        `publish_time` per delivery date. Multiple days are merged into one AuctionResult.
         """
         if end_date is None:
             end_date = start_date
@@ -216,9 +226,17 @@ class SemoProvider(BaseProvider):
             ]
         )
         latest = _latest_by_delivery_date(refs, start_date, end_date)
-        return [
+        results = [
             parse_auction_report(self.fetch_report(ref.id)) for ref in sorted(latest.values(), key=lambda r: r.date)
         ]
+        return AuctionResult(
+            price_eur=[dp for r in results for dp in r.price_eur],
+            price_gbp=[dp for r in results for dp in r.price_gbp],
+            ni_volumes=[dp for r in results for dp in r.ni_volumes],
+            ni_net_position=[dp for r in results for dp in r.ni_net_position],
+            roi_volumes=[dp for r in results for dp in r.roi_volumes],
+            roi_net_position=[dp for r in results for dp in r.roi_net_position],
+        )
 
     def get_fpns(
         self,
@@ -236,7 +254,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_DailyFinalPhysicalNotifications"),
+                ("name", "PUB_DailyFinalPhysicalNotifications"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start_date.strftime("%Y-%m-%d")),
@@ -254,34 +272,42 @@ class SemoProvider(BaseProvider):
 
     def get_imbalance_forecast(
         self,
-        start_date: dt.date,
-        end_date: dt.date | None = None,
+        start: dt.datetime,
+        end: dt.datetime | None = None,
     ) -> list[HrlyForecastImbalance]:
-        """Get hourly forecast imbalances by trade date, inclusive on both ends, sorted by start_time.
+        """Get hourly forecast imbalance rows from all files whose publish time falls within [start, end].
 
-        Deduplicates to the latest-published report per trade date before fetching.
+        Files are published hourly, so a multi-hour range returns overlapping forecast periods
+        from successive snapshots. Each row carries its publish_time for disambiguation.
+        Rows are sorted by (publish_time, start_time).
         """
-        if end_date is None:
-            end_date = start_date
-        if end_date < start_date:
-            raise ValueError("end_date must be on or after start_date")
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
+        if end is None:
+            end = start
+        if end < start:
+            raise ValueError("end must be on or after start")
+
+        dublin_start = start.astimezone(TZ_DUBLIN)
+        dublin_end = end.astimezone(TZ_DUBLIN)
 
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_HrlyForecastImbalance"),
+                ("name", "PUB_HrlyForecastImbalance"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
-                ("date_from", start_date.strftime("%Y-%m-%d")),
-                ("date_to", end_date.strftime("%Y-%m-%d")),
+                ("date_from", dublin_start.date().strftime("%Y-%m-%d")),
+                ("date_to", dublin_end.date().strftime("%Y-%m-%d")),
             ]
         )
-        latest = _latest_by_delivery_date(refs, start_date, end_date)
+        refs = [
+            r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
+        ]
         rows = [
             row
-            for ref in sorted(latest.values(), key=lambda r: r.date)
+            for ref in refs
             for row in parse_hrly_forecast_imbalance_report(self.fetch_raw_report(ref.resource_name))
         ]
-        rows.sort(key=lambda r: r.start_time)
+        rows.sort(key=lambda r: (r.publish_time, r.start_time))
         return rows
 
     def get_imbalance_price_supporting_info(
@@ -290,6 +316,7 @@ class SemoProvider(BaseProvider):
         end: dt.datetime | None = None,
     ) -> list[ImbalancePriceSuppInfo]:
         """Get every 5-minute imbalance price supp info within the datetime range, sorted."""
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
         if end is None:
             end = start
         if end < start:
@@ -297,7 +324,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_5MinImbalPrcSuppInfo"),
+                ("name", "PUB_5MinImbalPrcSuppInfo"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start.date().strftime("%Y-%m-%d")),
@@ -313,24 +340,33 @@ class SemoProvider(BaseProvider):
         rows.sort(key=lambda r: r.start_time)
         return rows
 
-    def get_lts_schedule(self, start: dt.datetime, end: dt.datetime | None = None):
+    def get_lts_schedule(self, start: dt.datetime, end: dt.datetime | None = None) -> list[LTSReport]:
+        """Get LTS operational schedule rows from all files whose publish time falls within [start, end].
+
+        Rows are sorted by (publish_time, start_time).
+        """
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
         if end is None:
             end = start
         if end < start:
             raise ValueError("end must be on or after start")
 
+        dublin_start = start.astimezone(TZ_DUBLIN)
+        dublin_end = end.astimezone(TZ_DUBLIN)
+
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_LTSDOperationalSchedule"),
-                ("date_from", start.date().strftime("%Y-%m-%d")),
-                ("date_to", end.date().strftime("%Y-%m-%d")),
+                ("name", "PUB_LTSDOperationalSchedule"),
+                ("date_from", dublin_start.date().strftime("%Y-%m-%d")),
+                ("date_to", dublin_end.date().strftime("%Y-%m-%d")),
             ]
         )
         refs = [
             r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
-        reports = [parse_lts_report(self.fetch_raw_report(r.resource_name)) for r in refs]
-        return reports
+        rows = [row for ref in refs for row in parse_lts_report(self.fetch_raw_report(ref.resource_name))]
+        rows.sort(key=lambda r: (r.publish_time, r.start_time))
+        return rows
 
     def get_metered_generation(
         self,
@@ -348,7 +384,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_DailyMeterDataD1"),
+                ("name", "PUB_DailyMeterDataD1"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start_date.strftime("%Y-%m-%d")),
@@ -370,6 +406,7 @@ class SemoProvider(BaseProvider):
         end: dt.datetime | None = None,
     ) -> list[ImbalanceSettlementReport]:
         """Get every 30-minute imbalance settlement within the datetime range, sorted."""
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
         if end is None:
             end = start
         if end < start:
@@ -377,7 +414,7 @@ class SemoProvider(BaseProvider):
 
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_30MinAvgImbalPrc"),
+                ("name", "PUB_30MinAvgImbalPrc"),
                 ("sort_by", "PublishTime"),
                 ("order_by", "DESC"),
                 ("date_from", start.date().strftime("%Y-%m-%d")),
@@ -391,25 +428,33 @@ class SemoProvider(BaseProvider):
         reports.sort(key=lambda r: r.start_time)
         return reports
 
-    def get_wind_forecast(self, start: dt.datetime, end: dt.datetime | None = None):
+    def get_wind_forecast(self, start: dt.datetime, end: dt.datetime | None = None) -> list[Forecast]:
+        """Get wind forecast snapshots from all files whose publish time falls within [start, end].
+
+        Each returned Forecast covers one publish snapshot; results are sorted by publish_time.
+        """
+        start, end = _ensure_tz_aware(start), (_ensure_tz_aware(end) if end is not None else None)
         if end is None:
             end = start
         if end < start:
             raise ValueError("end must be on or after start")
 
+        dublin_start = start.astimezone(TZ_DUBLIN)
+        dublin_end = end.astimezone(TZ_DUBLIN)
+
         refs = self.list_reports(
             [
-                ("ReportName", "PUB_15MinAggWindFcst"),
-                ("date_from", start.date().strftime("%Y-%m-%d")),
-                ("date_to", end.date().strftime("%Y-%m-%d")),
+                ("name", "PUB_15MinAggWindFcst"),
+                ("date_from", dublin_start.date().strftime("%Y-%m-%d")),
+                ("date_to", dublin_end.date().strftime("%Y-%m-%d")),
             ]
         )
         refs = [
             r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
-        reports = [parse_wind_forecast_report(self.fetch_raw_report(r.resource_name)) for r in refs]
-        reports.sort(key=lambda r: r.start_time)
-        return reports
+        forecasts = [parse_wind_forecast_report(self.fetch_raw_report(r.resource_name)) for r in refs]
+        forecasts.sort(key=lambda r: r.publish_time)
+        return forecasts
 
 
 def _latest_by_delivery_date(

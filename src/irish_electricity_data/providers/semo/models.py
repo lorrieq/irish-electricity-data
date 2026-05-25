@@ -8,9 +8,6 @@ from ...schema.models import DataPoint, _FrozenModel
 class AuctionResult(_FrozenModel):
     """Represents an auction result with prices, volumes and net positions across NI/ROI."""
 
-    auction_date: dt.datetime | None = None
-    delivery_date: dt.date | None = None
-    publish_time: dt.datetime | None = None
     price_eur: list[DataPoint]
     price_gbp: list[DataPoint]
     ni_volumes: list[DataPoint]
@@ -80,7 +77,8 @@ class HrlyForecastImbalance(_FrozenModel):
     total_pn: float
     net_interconnector_schedule: float
     tso_demand_forecast: float
-    tso_renewable_forecast: float
+    tso_renewable_forecast_pd: float
+    tso_renewable_forecast_npdr: float
     calculated_imbalance: float
 
 

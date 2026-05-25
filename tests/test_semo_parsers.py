@@ -170,7 +170,8 @@ def test_parse_hrly_forecast_imbalance_report():
     assert first.total_pn == 334.9
     assert first.net_interconnector_schedule == 1493.0
     assert first.tso_demand_forecast == 4990.0
-    assert first.tso_renewable_forecast == 2630.566
+    assert first.tso_renewable_forecast_pd == 2100.0
+    assert first.tso_renewable_forecast_npdr == 530.566
     assert first.calculated_imbalance == 531.534
 
     second = result[1]

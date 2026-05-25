@@ -62,24 +62,6 @@ def parse_series_chunk(data: _SeriesRow) -> list[DataPoint]:
     return [DataPoint(timestamp=t, value=v) for t, v in zip(timestamps, values, strict=False)]
 
 
-def _maybe_datetime(value: str | None) -> dt.datetime | None:
-    if value is None:
-        return None
-    try:
-        return dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-
-
-def _maybe_date(value: str | None) -> dt.date | None:
-    if value is None:
-        return None
-    try:
-        return dt.datetime.fromisoformat(value.replace("Z", "+00:00")).date()
-    except ValueError:
-        return None
-
-
 def _yn_to_bool(value: str) -> bool:
     if value == "Y":
         return True
@@ -102,10 +84,6 @@ def parse_auction_report(report_content: dict[str, Any]) -> AuctionResult:
     rows = report_content.get("rows")
     if not rows:
         raise ParseError("auction report missing 'rows'")
-
-    auction_date = _maybe_datetime(report_content.get("AuctionDate"))
-    publish_time = _maybe_datetime(report_content.get("PublishTime"))
-    delivery_date = _maybe_date(report_content.get("Date"))
 
     price_eur: list[DataPoint] | None = None
     price_gbp: list[DataPoint] | None = None
@@ -130,9 +108,6 @@ def parse_auction_report(report_content: dict[str, Any]) -> AuctionResult:
             raise ParseError(f"area {required!r} missing from auction report")
 
     return AuctionResult(
-        auction_date=auction_date,
-        delivery_date=delivery_date,
-        publish_time=publish_time,
         price_eur=price_eur,
         price_gbp=price_gbp,
         ni_volumes=area_data["NI"]["volumes"],
@@ -190,7 +165,8 @@ def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance
             total_pn=float(a["TotalPN"]),
             net_interconnector_schedule=float(a["NetInterconnectorSchedule"]),
             tso_demand_forecast=float(a["TSODemandForecast"]),
-            tso_renewable_forecast=float(a["TSORenewableForecast"]),
+            tso_renewable_forecast_pd=float(a["TSORenewableForecastPD"]),
+            tso_renewable_forecast_npdr=float(a["TSORenewableForecastNPDR"]),
             calculated_imbalance=float(a["CalculatedImbalance"]),
         )
         for row in rows
