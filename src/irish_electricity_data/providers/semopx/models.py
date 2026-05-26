@@ -15,16 +15,6 @@ class PortfolioPosition(_FrozenModel):
     positions: list[DataPoint]
 
 
-class MarketResult(_FrozenModel):
-    """Parsed SEMOpx auction market result containing per-portfolio cleared positions."""
-
-    auction: str | None = None
-    auction_name: str | None = None
-    auction_datetime: dt.datetime | None = None
-    publication_datetime: dt.datetime | None = None
-    portfolios: list[PortfolioPosition]
-
-
 class InterconnectorFlow(_FrozenModel):
     """Represents a single interconnector flow interval."""
 

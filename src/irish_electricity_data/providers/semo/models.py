@@ -69,8 +69,8 @@ class ImbalancePriceSuppInfo(_FrozenModel):
     constraint_id: str | None = None
 
 
-class HrlyForecastImbalance(_FrozenModel):
-    """Represents an hourly forecast imbalance period."""
+class ImbalanceForecast(_FrozenModel):
+    """Represents a row from a PUB_HrlyForecastImbalance report."""
 
     publish_time: dt.datetime
     start_time: dt.datetime

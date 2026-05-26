@@ -11,7 +11,7 @@ from .models import (
     AuctionResult,
     DailyMeterData,
     Forecast,
-    HrlyForecastImbalance,
+    ImbalanceForecast,
     ImbalancePriceReport,
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
@@ -141,7 +141,7 @@ def parse_daily_meter_data_report(xml: str) -> list[DailyMeterData]:
     ]
 
 
-def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance]:
+def parse_imbalance_forecast_report(xml: str) -> list[ImbalanceForecast]:
     """Parse a `PUB_HrlyForecastImbalance_*.xml` payload into a list of rows.
 
     Each file covers one trade day; rows represent individual half-hour forecast
@@ -159,7 +159,7 @@ def parse_hrly_forecast_imbalance_report(xml: str) -> list[HrlyForecastImbalance
         raise ParseError("forecast imbalance report missing <PUB_HrlyForecastImbalance> elements")
 
     return [
-        HrlyForecastImbalance(
+        ImbalanceForecast(
             publish_time=publish_time,
             start_time=_parse_aware_utc(a["StartTime"]),
             total_pn=float(a["TotalPN"]),

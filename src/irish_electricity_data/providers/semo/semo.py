@@ -13,7 +13,7 @@ from .models import (
     AuctionResult,
     DailyMeterData,
     Forecast,
-    HrlyForecastImbalance,
+    ImbalanceForecast,
     ImbalancePriceReport,
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
@@ -23,7 +23,7 @@ from .models import (
 from .parsers import (
     parse_auction_report,
     parse_daily_meter_data_report,
-    parse_hrly_forecast_imbalance_report,
+    parse_imbalance_forecast_report,
     parse_imbalance_price_report,
     parse_imbalance_price_supp_info_report,
     parse_imbalance_settlement_report,
@@ -51,7 +51,7 @@ _REPORT_PARSERS: dict[str, Callable[[str], Any]] = {
     "PUB_30MinAvgImbalPrc": parse_imbalance_settlement_report,
     "PUB_DailyFinalPhysicalNotifications": parse_physical_notifications_report,
     "PUB_DailyMeterDataD1": parse_daily_meter_data_report,
-    "PUB_HrlyForecastImbalance": parse_hrly_forecast_imbalance_report,
+    "PUB_HrlyForecastImbalance": parse_imbalance_forecast_report,
     "PUB_15MinAggWindFcst": parse_wind_forecast_report,
     "PUB_LTSDOperationalSchedule": parse_lts_report,
 }
@@ -274,7 +274,7 @@ class SemoProvider(BaseProvider):
         self,
         start: dt.datetime,
         end: dt.datetime | None = None,
-    ) -> list[HrlyForecastImbalance]:
+    ) -> list[ImbalanceForecast]:
         """Get hourly forecast imbalance rows from all files whose publish time falls within [start, end].
 
         Files are published hourly, so a multi-hour range returns overlapping forecast periods
@@ -305,7 +305,7 @@ class SemoProvider(BaseProvider):
         rows = [
             row
             for ref in refs
-            for row in parse_hrly_forecast_imbalance_report(self.fetch_raw_report(ref.resource_name))
+            for row in parse_imbalance_forecast_report(self.fetch_raw_report(ref.resource_name))
         ]
         rows.sort(key=lambda r: (r.publish_time, r.start_time))
         return rows

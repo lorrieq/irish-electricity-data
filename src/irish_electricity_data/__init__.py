@@ -25,7 +25,7 @@ from .providers.semo import (
     ImbalanceSettlementReport,
     PhysicalNotification,
 )
-from .providers.semopx import MarketResult, PortfolioPosition
+from .providers.semopx import PortfolioPosition
 from .schema import (
     Auction,
     DataPoint,
@@ -44,7 +44,6 @@ __all__ = [
     "Interconnector",
     "IrishElectricityDataError",
     "MarketClient",
-    "MarketResult",
     "ParseError",
     "PhysicalNotification",
     "PortfolioPosition",

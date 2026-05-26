@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 from irish_electricity_data.providers.semopx import (
     InterconnectorFlow,
-    MarketResult,
+    PortfolioPosition,
     parse_interconnector_flows,
     parse_market_result,
 )
@@ -15,10 +15,11 @@ def test_parse_market_result():
     content = fixture_path.read_text()
     result = parse_market_result(content)
 
-    assert isinstance(result, MarketResult)
-    assert len(result.portfolios) > 0
+    assert isinstance(result, list)
+    assert len(result) > 0
 
-    first = result.portfolios[0]
+    first = result[0]
+    assert isinstance(first, PortfolioPosition)
     assert first.participant == "AARHUS"
     assert first.unit_id == "AU_500145"
     assert first.order_type == "Linear order"
@@ -27,7 +28,7 @@ def test_parse_market_result():
     assert first.positions[0].timestamp == dt.datetime(2026, 4, 19, 22, tzinfo=ZoneInfo("UTC"))
     assert first.positions[0].value == 2.0
 
-    last = result.portfolios[-1]
+    last = result[-1]
     assert last.participant == "WFST"
     assert last.unit_id == "GU_404480"
     assert last.order_type == "Linear order"

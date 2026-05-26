@@ -76,8 +76,8 @@ def test_get_market_result(monkeypatch):
 
     result = provider.get_market_result(Auction.DAY_AHEAD, _DELIVERY)
 
-    assert result.auction == "SEM-DA"
-    assert len(result.portfolios) > 0
+    assert isinstance(result, list)
+    assert len(result) > 0
 
 
 def test_get_market_result_not_found(monkeypatch):

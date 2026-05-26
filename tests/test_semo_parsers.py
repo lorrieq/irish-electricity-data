@@ -7,7 +7,7 @@ from irish_electricity_data.providers.semo import (
     AuctionResult,
     DailyMeterData,
     Forecast,
-    HrlyForecastImbalance,
+    ImbalanceForecast,
     ImbalancePriceReport,
     ImbalancePriceSuppInfo,
     ImbalanceSettlementReport,
@@ -15,7 +15,7 @@ from irish_electricity_data.providers.semo import (
     PhysicalNotification,
     parse_auction_report,
     parse_daily_meter_data_report,
-    parse_hrly_forecast_imbalance_report,
+    parse_imbalance_forecast_report,
     parse_imbalance_price_report,
     parse_imbalance_price_supp_info_report,
     parse_imbalance_settlement_report,
@@ -159,10 +159,10 @@ def test_parse_imbalance_price_supp_info_report():
 
 def test_parse_hrly_forecast_imbalance_report():
     fixture_path = Path(__file__).parent / "fixtures" / "semo" / "PUB_HrlyForecastImbalance.xml"
-    result = parse_hrly_forecast_imbalance_report(fixture_path.read_text())
+    result = parse_imbalance_forecast_report(fixture_path.read_text())
 
     assert len(result) == 2
-    assert all(isinstance(row, HrlyForecastImbalance) for row in result)
+    assert all(isinstance(row, ImbalanceForecast) for row in result)
 
     first = result[0]
     assert first.publish_time == dt.datetime(2025, 5, 26, 8, 0, 31, tzinfo=ZoneInfo("UTC"))

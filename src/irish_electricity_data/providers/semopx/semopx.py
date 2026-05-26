@@ -7,7 +7,7 @@ from typing import Any
 from ...core.exceptions import ProviderError, ReportNotFoundError
 from ...schema.models import Auction, ReportReference
 from ..base import BaseProvider
-from .models import MarketResult
+from .models import PortfolioPosition
 from .parsers import parse_market_result, parse_report_list
 
 _log = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ class SemopxProvider(BaseProvider):
     def fetch_report(self, resource_name: str) -> str:
         return self._get_text(f"/documents/{resource_name}")
 
-    def get_market_result(self, auction: Auction, delivery_date: dt.date) -> MarketResult:
+    def get_market_result(self, auction: Auction, delivery_date: dt.date) -> list[PortfolioPosition]:
         auction_id = _SEMOPX_AUCTION_ID[auction]
         prefix = f"MarketResult_{auction_id}_"
         refs = self.list_reports(

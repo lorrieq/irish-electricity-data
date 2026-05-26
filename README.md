@@ -71,9 +71,9 @@ import datetime as dt
 from irish_electricity_data import MarketClient
 
 with MarketClient() as client:
-    series = client.eirgrid.get_outturn_wind(dt.date(2025, 1, 15))
-    for point in series.data:
-        print(point.timestamp, point.value)
+    start, end = dt.datetime(2025, 1, 15, 10), dt.datetime(2025, 1, 15, 15)
+    data = client.eirgrid.get_outturn_wind(start, end)
+    print(data.wind_ie)
 ```
 
 ### SEMO — 5-minute imbalance prices
@@ -83,12 +83,10 @@ import datetime as dt
 from irish_electricity_data import MarketClient
 
 with MarketClient() as client:
-    prices = client.semo.get_imbalance_prices(
-        start=dt.datetime(2025, 1, 15, 0, 0, tzinfo=dt.timezone.utc),
-        end=dt.datetime(2025, 1, 15, 23, 55, tzinfo=dt.timezone.utc),
+    data = client.semo.get_settlement_prices(
+        start=dt.datetime(2026, 5, 20),
+        end=dt.datetime(2026, 5, 20, 10),
     )
-    for p in prices:
-        print(p.start_time, p.imbalance_price)
 ```
 
 ### SEMOpx — day-ahead market results
@@ -98,9 +96,13 @@ import datetime as dt
 from irish_electricity_data import Auction, MarketClient
 
 with MarketClient() as client:
-    result = client.semopx.get_market_result(Auction.DAY_AHEAD, dt.date(2025, 1, 15))
-    for portfolio in result.portfolios:
-        print(portfolio.participant, portfolio.unit_id)
+    yesterday = dt.date.today() - dt.timedelta(days=1)
+    result = client.semopx.get_market_result(Auction.DAY_AHEAD, yesterday)
+
+    elem = result[0]
+    print(elem.unit_id)
+    print(elem.positions)
+
 ```
 
 ## Design

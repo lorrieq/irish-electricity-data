@@ -7,7 +7,7 @@ from xml.etree import ElementTree as ET
 from ...core.constants import TZ_UTC
 from ...core.exceptions import ParseError
 from ...schema.models import DataPoint, ReportReference
-from .models import InterconnectorFlow, MarketResult, PortfolioPosition
+from .models import InterconnectorFlow, PortfolioPosition
 
 
 def parse_report_list(items: list[dict[str, Any]]) -> list[ReportReference]:
@@ -124,16 +124,7 @@ def parse_interconnector_flows(xml: str) -> list[InterconnectorFlow]:
     return data
 
 
-def parse_market_result(report_content: str) -> MarketResult:
-    """Parse a SEMOpx market result CSV into a MarketResult with per-portfolio positions."""
+def parse_market_result(report_content: str) -> list[PortfolioPosition]:
+    """Parse a SEMOpx market result CSV into per-portfolio cleared positions."""
     pieces = _split_lines(report_content)
-
-    portfolios = [_parse_portfolio(pieces[s:e]) for s, e in _portfolio_slices(pieces)]
-
-    return MarketResult(
-        auction=_header_value(pieces, "Auction"),
-        auction_name=_header_value(pieces, "Auction name"),
-        auction_datetime=_maybe_datetime(_header_value(pieces, "Auction date time")),
-        publication_datetime=_maybe_datetime(_header_value(pieces, "Publication date time")),
-        portfolios=portfolios,
-    )
+    return [_parse_portfolio(pieces[s:e]) for s, e in _portfolio_slices(pieces)]
