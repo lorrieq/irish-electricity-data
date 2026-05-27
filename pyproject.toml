@@ -55,7 +55,8 @@ select = [
     "RUF", # ruff-specific catches
 ]
 ignore = [
-    "E501", # line too long — handled by the formatter
+    "E501",   # line too long — handled by the formatter
+    "RUF012", # mutable defaults in Pydantic BaseModel subclasses are safe
 ]
 
 [tool.ruff.format]

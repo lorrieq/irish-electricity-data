@@ -1,5 +1,7 @@
 # Irish Electricity Data
 
+[![codecov](https://codecov.io/gh/lorrieq/irish-electricity-data/graph/badge.svg)](https://codecov.io/gh/lorrieq/irish-electricity-data)
+
 Typed, synchronous Python client for Irish electricity market data. Covers a number of different sources, the EirGrid smartgrid dashboard, SEMO and SEMOpx reports and returns normalised Pydantic models with tz-aware UTC timestamps throughout.
 
 ## Data sources
