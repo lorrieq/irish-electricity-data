@@ -24,6 +24,8 @@ from irish_electricity_data.providers.semo import (
     parse_series_chunk,
     parse_wind_forecast_report,
 )
+
+
 def test_parse_series_chunk():
     data = [
         ["Index prices", 30, "EUR"],

@@ -15,15 +15,15 @@ _OUTTURN_FIELD_NAME_TO_LABEL: dict[str, str] = {
 }
 
 _OUTTURN_KEY_TO_FIELD: dict[tuple[str, str], str] = {
-    ("ALL", "Wind"):   "wind_ie",
-    ("NI",  "Wind"):   "wind_ni",
-    ("ROI", "Wind"):   "wind_roi",
+    ("ALL", "Wind"): "wind_ie",
+    ("NI", "Wind"): "wind_ni",
+    ("ROI", "Wind"): "wind_roi",
     ("ALL", "Demand"): "demand_ie",
-    ("NI",  "Demand"): "demand_ni",
+    ("NI", "Demand"): "demand_ni",
     ("ROI", "Demand"): "demand_roi",
-    ("ALL", "Solar"):  "solar_ie",
-    ("NI",  "Solar"):  "solar_ni",
-    ("ROI", "Solar"):  "solar_roi",
+    ("ALL", "Solar"): "solar_ie",
+    ("NI", "Solar"): "solar_ni",
+    ("ROI", "Solar"): "solar_roi",
 }
 
 _FUEL_FIELD_TO_FIELD: dict[str, str] = {
@@ -130,10 +130,12 @@ def parse_outturn(payload: dict[str, Any]) -> EirgridOutturnData:
         field = _OUTTURN_KEY_TO_FIELD.get((row["Region"], label))
         if field is None:
             continue
-        by_field[field].append(DataPoint(
-            timestamp=_parse_effective_time(row["EffectiveTime"]),
-            value=value,
-        ))
+        by_field[field].append(
+            DataPoint(
+                timestamp=_parse_effective_time(row["EffectiveTime"]),
+                value=value,
+            )
+        )
 
     for points in by_field.values():
         points.sort(key=lambda p: p.timestamp)

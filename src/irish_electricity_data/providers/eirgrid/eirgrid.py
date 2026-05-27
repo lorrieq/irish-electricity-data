@@ -8,7 +8,15 @@ from ...core.exceptions import ProviderError
 from ...schema.models import DataPoint
 from ..base import BaseProvider
 from .models import EirgridCo2Data, EirgridFuelMix, EirgridInterconnectorData, EirgridOutturnData
-from .parsers import parse_co2, parse_frequency, parse_fuel_mix, parse_generation, parse_interconnector_flows, parse_outturn, parse_snsp
+from .parsers import (
+    parse_co2,
+    parse_frequency,
+    parse_fuel_mix,
+    parse_generation,
+    parse_interconnector_flows,
+    parse_outturn,
+    parse_snsp,
+)
 
 
 def _to_ist(ts: dt.datetime) -> dt.datetime:
@@ -87,7 +95,7 @@ class EirGridProvider(BaseProvider):
         if not isinstance(payload, dict):
             raise ProviderError("EirGrid CO2 response was not a JSON object")
         return parse_co2(payload)
-    
+
     def _fetch_frequency(self, range_id: str, start: dt.datetime, end: dt.datetime) -> list[DataPoint]:
         if range_id == "hour":
             start_str = start.strftime("%d-%b-%Y %H:%M")

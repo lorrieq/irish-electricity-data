@@ -281,7 +281,7 @@ def parse_imbalance_settlement_report(xml: str) -> ImbalanceSettlementReport:
     )
 
 
-def parse_lts_report(xml: str):
+def parse_lts_report(xml: str) -> list[LTSReport]:
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as exc:
@@ -335,7 +335,7 @@ def parse_physical_notifications_report(xml: str) -> list[PhysicalNotification]:
     ]
 
 
-def parse_wind_forecast_report(xml: str):
+def parse_wind_forecast_report(xml: str) -> Forecast:
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as exc:

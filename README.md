@@ -64,7 +64,7 @@ pip install irish-electricity-data
 
 All providers are available through a single `MarketClient` object or they can be instantiated directly. Use it as a context manager to ensure the underlying HTTP connection is closed cleanly.
 
-### EirGrid — wind outturn
+### EirGrid — outturn wind production
 
 ```python
 import datetime as dt
@@ -76,7 +76,7 @@ with MarketClient() as client:
     print(data.wind_ie)
 ```
 
-### SEMO — 5-minute imbalance prices
+### SEMO — Imbalance settlement prices
 
 ```python
 import datetime as dt
@@ -89,7 +89,7 @@ with MarketClient() as client:
     )
 ```
 
-### SEMOpx — day-ahead market results
+### SEMOpx — Cleared positions per unit
 
 ```python
 import datetime as dt

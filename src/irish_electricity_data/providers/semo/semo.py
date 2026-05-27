@@ -148,8 +148,7 @@ class SemoProvider(BaseProvider):
             ]
         )
         refs = [
-            r for r in refs
-            if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
+            r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
         refs.sort(key=lambda r: _datetime_from_resource_name(r.resource_name) or dt.datetime.min.replace(tzinfo=TZ_UTC))
 
@@ -303,9 +302,7 @@ class SemoProvider(BaseProvider):
             r for r in refs if (t := _datetime_from_resource_name(r.resource_name)) is not None and start <= t <= end
         ]
         rows = [
-            row
-            for ref in refs
-            for row in parse_imbalance_forecast_report(self.fetch_raw_report(ref.resource_name))
+            row for ref in refs for row in parse_imbalance_forecast_report(self.fetch_raw_report(ref.resource_name))
         ]
         rows.sort(key=lambda r: (r.publish_time, r.start_time))
         return rows
